@@ -3,8 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const user = require("./routes/user");
-const form = require("./routes/form")
-
+const form = require("./routes/form");
+const article = require("./routes/article");
 const app = express();
 const port = 4005;
 
@@ -29,6 +29,7 @@ db.once("open", () => console.log("We're connected to the cloud database"));
 
 app.use("/api/users", user);
 app.use('/api/forms', form);
+app.use('/api/articles', article);
 
 setInterval(() => {
   console.log(`interval`)
