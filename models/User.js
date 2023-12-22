@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'lastName is required']
     },
+    idNumber:{
+        type: String,
+        default: 'Edit my ID Number'
+    },
     department:{
         type:String,
         require: [true, 'department is required']
