@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'address is required']
     },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
     isClockedIn:{
         type: Boolean,
         default: false
