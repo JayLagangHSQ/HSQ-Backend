@@ -5,6 +5,7 @@ const cors = require("cors");
 const user = require("./routes/user");
 const form = require("./routes/form");
 const article = require("./routes/article");
+const link = require("./routes/link")
 const app = express();
 const port = 4005;
 
@@ -30,7 +31,7 @@ db.once("open", () => console.log("We're connected to the cloud database"));
 app.use("/api/users", user);
 app.use('/api/forms', form);
 app.use('/api/articles', article);
-
+app.use('/api/links', link)
 setInterval(() => {
   console.log(`interval`)
 }, 1000);
