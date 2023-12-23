@@ -83,21 +83,21 @@ module.exports.getArticleByTitle = async (req, res) => {
     try {
 
         // Extract form name from the request body
-        const { name } = req.body;
+        const { title } = req.body;
 
         // Validate if the name is provided
-        if (!name) {
+        if (!title) {
             return res.status(400).send({ error: 'Please provide the form name for the search.' });
         }
 
         // Create a case-insensitive regular expression for the form name
-        const nameRegExp = new RegExp(name, 'i');
+        const titleRegExp = new RegExp(title, 'i');
 
         // Search for forms by name in the database using the regular expression
-        const foundForms = await Form.find({ name: nameRegExp });
+        const foundArticles = await Article.find({ name: titleRegExp });
 
         // Respond with the found forms
-        return res.status(200).send(foundForms);
+        return res.status(200).send(foundArticles);
 
     } catch (error) {
 
