@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
 const articleSchema = new mongoose.Schema({
-    category: String,
-    subcategory: String,
+    department: String,
+    beneficiary: [String], //general,managers,newHires
     title: String,
-    mainContent: String,
+    content: String,
     imageKeys: [
         {
             imageKey: String
