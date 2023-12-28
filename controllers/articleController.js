@@ -4,7 +4,7 @@ module.exports.addNewArticle = async (req, res) => {
     try {
 
         // Extract form data from the request body
-        const { department, beneficiary, title, content} = req.body;
+        const { department, beneficiary, title, content, originalPostDate, latestUpdate,authur} = req.body;
 
         // Validate if required fields are present
         if (!department || !beneficiary || !title || !content) {
@@ -16,7 +16,10 @@ module.exports.addNewArticle = async (req, res) => {
             department,
             beneficiary,
             title,
-            content
+            content,
+            originalPostDate,
+            latestUpdate,
+            authur
         });
 
         // Save the form to the database
