@@ -4,17 +4,19 @@ module.exports.addNewArticle = async (req, res) => {
     try {
 
         // Extract form data from the request body
-        const { title, mainContent} = req.body;
+        const { department, beneficiary, title, content} = req.body;
 
         // Validate if required fields are present
-        if (!title || !mainContent) {
+        if (!department || !beneficiary || !title || !content) {
             return res.status(400).send({ error: 'Please provide title, introduction, mainBody, conclusion, and references.' });
         }
 
         // Create a new form instance
         const newArticle = new Article({
+            department,
+            beneficiary,
             title,
-            mainContent,
+            content
         });
 
         // Save the form to the database
