@@ -16,7 +16,7 @@ const articleSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    Author: [
+    author: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
