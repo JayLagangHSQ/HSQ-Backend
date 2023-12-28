@@ -32,9 +32,6 @@ app.use("/api/users", user);
 app.use('/api/forms', form);
 app.use('/api/articles', article);
 app.use('/api/links', link)
-setInterval(() => {
-  console.log(`interval`)
-}, 1000);
 
 if(require.main === module) {
   app.listen(port, () => console.log(`Server is running at port ${port}`));
