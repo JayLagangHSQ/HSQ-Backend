@@ -9,5 +9,6 @@ router.post('/newArticle',verify, verifyManager, articleController.addNewArticle
 router.put('/article/edit',verify, verifyManager, articleController.editArticle)
 router.get('/',verify, articleController.getAllArticle)
 router.post('/article',verify, articleController.getArticleByTitle)
+router.get('/article/:articleId',verify, articleController.getArticleById)
 
 module.exports = router;

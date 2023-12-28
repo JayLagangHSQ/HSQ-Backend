@@ -83,6 +83,32 @@ module.exports.getAllArticle = async (req, res) => {
     }
 };
 
+module.exports.getArticleById = async (req, res) => {
+    try {
+        // Extract article ID from the request parameters
+        const { articleId } = req.params;
+
+        // Validate if the article ID is provided
+        if (!articleId) {
+            return res.status(400).send({ error: 'Please provide the article ID.' });
+        }
+
+        // Find the article by ID
+        const foundArticle = await Article.findById(articleId);
+
+        // Check if the article exists
+        if (!foundArticle) {
+            return res.status(404).send({ error: 'Article not found.' });
+        }
+
+        // Respond with the found article
+        return res.status(200).send(foundArticle);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ error: 'Internal Server Error' });
+    }
+};
+
 module.exports.getArticleByTitle = async (req, res) => {
     
     try {
