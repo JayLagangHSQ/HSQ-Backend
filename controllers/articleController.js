@@ -93,21 +93,43 @@ module.exports.getArticleById = async (req, res) => {
             return res.status(400).send({ error: 'Please provide the article ID.' });
         }
 
-        // Find the article by ID
-        const foundArticle = await Article.findById(articleId);
+        // Find the article by ID and populate the 'author' field
+        const foundArticle = await Article.findById(articleId).populate('author');
 
         // Check if the article exists
         if (!foundArticle) {
             return res.status(404).send({ error: 'Article not found.' });
         }
 
-        // Respond with the found article
-        return res.status(200).send(foundArticle);
+        // Map each author to return only the firstName and lastName
+        const authorsWithNames = foundArticle.author.map(author => {
+            return {
+                firstName: author.firstName,
+                lastName: author.lastName
+            };
+        });
+
+        let response = {
+            author: authorsWithNames,
+            department: foundArticle.department,
+            beneficiary: foundArticle.beneficiary,
+            content: foundArticle.content,
+            imageUrl:[],
+            docsUrl:[],
+            latestUpdate: foundArticle.latestUpdate,
+            originalPostDate: foundArticle.originalPostDate,
+            title: foundArticle.title,
+            id: foundArticle._id
+        };
+
+        // Respond with the modified found article
+        return res.status(200).send(response);
     } catch (error) {
         console.error(error);
         return res.status(500).send({ error: 'Internal Server Error' });
     }
 };
+
 
 module.exports.getArticleByTitle = async (req, res) => {
     
