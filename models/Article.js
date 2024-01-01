@@ -5,11 +5,7 @@ const articleSchema = new mongoose.Schema({
     beneficiary: [String], //general,managers,newHires
     title: String,
     content: String,
-    imageKeys: [
-        {
-            imageKey: String
-        }
-    ],
+    imageKeys: [],
     originalPostDate: Date,
     latestUpdate: Date,
     isActive: {

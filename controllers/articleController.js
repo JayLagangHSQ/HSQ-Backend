@@ -3,20 +3,22 @@ const Article = require('../models/Article')
 module.exports.addNewArticle = async (req, res) => {
     
     // Extract form data from the request body
+    let imageKeys = req.uploadedImages;
+    console.log(imageKeys)
     const { department, beneficiary, title, content, originalPostDate, latestUpdate, author} = req.body;
     try {
-
         // Validate if required fields are present
         if (!department || !beneficiary || !title || !content || !author) {
             return res.status(400).send({ error: 'Please provide title, introduction, mainBody, conclusion, and references.' });
         }
-        
+        console.log(department)
         // Create a new form instance
         const newArticle = new Article({
             department,
             beneficiary,
             title,
             content,
+            imageKeys,
             originalPostDate,
             latestUpdate,
             author
