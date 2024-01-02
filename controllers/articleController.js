@@ -1,4 +1,6 @@
 const Article = require('../models/Article')
+const image = require('../image');
+const {retrieveImageUrl} = image;
 
 module.exports.addNewArticle = async (req, res) => {
     
@@ -89,7 +91,7 @@ module.exports.getArticleById = async (req, res) => {
     try {
         // Extract article ID from the request parameters
         const { articleId } = req.params;
-
+        let imageUrl =[];
         // Validate if the article ID is provided
         if (!articleId) {
             return res.status(400).send({ error: 'Please provide the article ID.' });
@@ -101,6 +103,10 @@ module.exports.getArticleById = async (req, res) => {
         // Check if the article exists
         if (!foundArticle) {
             return res.status(404).send({ error: 'Article not found.' });
+        }
+        for (let image of foundArticle.imageKeys){
+            let signedUrl = await retrieveImageUrl(image.key)
+            imageUrl.push(signedUrl);
         }
 
         // Map each author to return only the firstName and lastName
@@ -116,7 +122,7 @@ module.exports.getArticleById = async (req, res) => {
             department: foundArticle.department,
             beneficiary: foundArticle.beneficiary,
             content: foundArticle.content,
-            imageUrl:[],
+            imageUrl:imageUrl,
             docsUrl:[],
             latestUpdate: foundArticle.latestUpdate,
             originalPostDate: foundArticle.originalPostDate,
