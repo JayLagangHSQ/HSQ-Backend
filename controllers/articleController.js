@@ -136,6 +136,7 @@ module.exports.getArticleById = async (req, res) => {
             beneficiary: foundArticle.beneficiary,
             content: foundArticle.content,
             imageUrl:imageUrl,
+            imageKeys: foundArticle.imageKeys,
             docsUrl:[],
             latestUpdate: foundArticle.latestUpdate,
             updatedBy: filteredUpdator,
@@ -151,7 +152,41 @@ module.exports.getArticleById = async (req, res) => {
         return res.status(500).send({ error: 'Internal Server Error' });
     }
 };
+module.exports.removeArticleImage = async(req,res) => {
 
+    const {articleId} = req.params;
+    const imageKey = req.deletedImageKey;
+    console.log(articleId)
+    try {
+        const article = await Article.findById(articleId);
+
+
+        if (!article) {
+            return res.status(404).send({ error: 'Article not found' });
+        }
+
+        console.log(article)
+        // Find the index of the image key in the product's image keys array
+        const imageIndex = article.imageKeys.findIndex(img => img.key === imageKey.key);
+        console.log(imageIndex)
+
+        // If the image key is found, remove it from the array
+        if (imageIndex !== -1) {
+            article.imageKeys.splice(imageIndex, 1);
+        } else {
+            return res.status(404).send({ error: 'Image key not found in product' });
+        }
+
+        // Save the updated product with the removed image key
+        await article.save();
+
+        // Send a success response
+        return res.status(200).send({ success: true });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send({ error: 'Internal server error' });
+    }
+}
 
 module.exports.getArticleByTitle = async (req, res) => {
     

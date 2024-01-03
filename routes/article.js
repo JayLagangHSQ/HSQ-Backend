@@ -10,6 +10,7 @@ const router = express.Router();
 
 router.post('/newArticle',verify, verifyManager,uploadMultipleImage, articleController.addNewArticle)
 router.put('/article/edit/:articleId',verify, verifyManager,uploadMultipleImage, articleController.editArticle)
+router.delete('/article/edit/deleteImage/:articleId',verify, verifyManager,deleteImage,articleController.removeArticleImage)
 router.get('/',verify, articleController.getAllArticle)
 router.post('/article',verify, articleController.getArticleByTitle)
 router.get('/article/:articleId',verify, articleController.getArticleById)
