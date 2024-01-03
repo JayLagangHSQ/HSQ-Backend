@@ -8,6 +8,7 @@ module.exports.addNewArticle = async (req, res) => {
     let imageKeys = req.uploadedImages;
     let { department, beneficiary, title, content, originalPostDate, latestUpdate, author} = req.body;
     beneficiary = JSON.parse(beneficiary)
+    let updatedBy = author;
     try {
         // Validate if required fields are present
         if (!department || !beneficiary || !title || !content || !author) {
@@ -22,6 +23,7 @@ module.exports.addNewArticle = async (req, res) => {
             imageKeys,
             originalPostDate,
             latestUpdate,
+            updatedBy,
             author
         });
 
