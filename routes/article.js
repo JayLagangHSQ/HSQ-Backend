@@ -9,7 +9,7 @@ const {uploadMultipleImage, deleteImage} = image;
 const router = express.Router();
 
 router.post('/newArticle',verify, verifyManager,uploadMultipleImage, articleController.addNewArticle)
-router.put('/article/edit',verify, verifyManager, articleController.editArticle)
+router.put('/article/edit/:articleId',verify, verifyManager,uploadMultipleImage, articleController.editArticle)
 router.get('/',verify, articleController.getAllArticle)
 router.post('/article',verify, articleController.getArticleByTitle)
 router.get('/article/:articleId',verify, articleController.getArticleById)

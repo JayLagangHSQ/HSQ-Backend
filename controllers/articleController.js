@@ -6,14 +6,13 @@ module.exports.addNewArticle = async (req, res) => {
     
     // Extract form data from the request body
     let imageKeys = req.uploadedImages;
-    console.log(imageKeys)
-    const { department, beneficiary, title, content, originalPostDate, latestUpdate, author} = req.body;
+    let { department, beneficiary, title, content, originalPostDate, latestUpdate, author} = req.body;
+    beneficiary = JSON.parse(beneficiary)
     try {
         // Validate if required fields are present
         if (!department || !beneficiary || !title || !content || !author) {
             return res.status(400).send({ error: 'Please provide title, introduction, mainBody, conclusion, and references.' });
         }
-        console.log(department)
         // Create a new form instance
         const newArticle = new Article({
             department,
@@ -40,11 +39,14 @@ module.exports.addNewArticle = async (req, res) => {
 module.exports.editArticle = async (req, res) => {
     try {
 
-        // Extract form data from the request body
-        const { title, mainContent, articleId } = req.body;
+        // Extract article ID from the request parameters
+        const { articleId } = req.params;
 
+        // Extract form data from the request body
+        let { department, beneficiary, title, content, latestUpdate, updatedBy} = req.body;
+        beneficiary = JSON.parse(beneficiary)
         // Validate if required fields are present
-        if (!title || !mainContent || !articleId) {
+        if (!department || !title || !content || !articleId) {
             return res.status(400).send({ error: 'Please provide title, introduction, mainBody, conclusion, and references.' });
         }
 
@@ -58,11 +60,14 @@ module.exports.editArticle = async (req, res) => {
 
         // Update form data
         existingArticle.title = title;
-        existingArticle.mainContent = mainContent;
+        existingArticle.content = content;
+        existingArticle.department = department;
+        existingArticle.beneficiary = beneficiary;
+        existingArticle.latestUpdate = latestUpdate;
+        existingArticle.updatedBy = updatedBy;
 
         // Save the updated form to the database
         await existingArticle.save();
-
         // Respond with the updated form
         return res.status(200).send(true);
     } catch (error) {
@@ -98,7 +103,9 @@ module.exports.getArticleById = async (req, res) => {
         }
 
         // Find the article by ID and populate the 'author' field
-        const foundArticle = await Article.findById(articleId).populate('author');
+        const foundArticle = await Article.findById(articleId)
+        .populate('author')
+        .populate('updatedBy');
 
         // Check if the article exists
         if (!foundArticle) {
@@ -116,6 +123,10 @@ module.exports.getArticleById = async (req, res) => {
                 lastName: author.lastName
             };
         });
+        const filteredUpdator = {
+            firstName: foundArticle.updatedBy.firstName,
+            lastName: foundArticle.updatedBy.lastName,
+        }
 
         let response = {
             author: authorsWithNames,
@@ -125,6 +136,7 @@ module.exports.getArticleById = async (req, res) => {
             imageUrl:imageUrl,
             docsUrl:[],
             latestUpdate: foundArticle.latestUpdate,
+            updatedBy: filteredUpdator,
             originalPostDate: foundArticle.originalPostDate,
             title: foundArticle.title,
             id: foundArticle._id

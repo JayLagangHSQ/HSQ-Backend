@@ -2,12 +2,16 @@ const mongoose = require('mongoose');
 
 const articleSchema = new mongoose.Schema({
     department: String,
-    beneficiary: [String], //general,managers,newHires
+    beneficiary: [], //general,managers,newHires
     title: String,
     content: String,
     imageKeys: [],
     originalPostDate: Date,
     latestUpdate: Date,
+    updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     isActive: {
         type: Boolean,
         default: true
