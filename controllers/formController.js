@@ -81,10 +81,6 @@ module.exports.getFormsByName = async (req, res) => {
         // Extract form name from the request body
         const { name } = req.body;
 
-        // Validate if the name is provided
-        if (!name) {
-            return res.status(400).send({ error: 'Please provide the form name for the search.' });
-        }
 
         // Create a case-insensitive regular expression for the form name
         const nameRegExp = new RegExp(name, 'i');
