@@ -220,25 +220,31 @@ module.exports.addArticleImage = async(req,res) =>{
     }
 }
 
-module.exports.getArticleByTitle = async (req, res) => {
+module.exports.getArticleByTitleAndDepartment = async (req, res) => {
     
     try {
+        // Extract title and department from the request body
+        let { title, department } = req.body;
+        
+        // Create a case-insensitive regular expression for the title
+        const titleRegExp = title ? new RegExp(title, 'i') : null;
 
-        // Extract form name from the request body
-        const { title } = req.body;
+        // Create a case-insensitive regular expression for the department
+        const departmentRegExp = department ? new RegExp(department, 'i') : null;
 
-        // Validate if the name is provided
-        if (!title) {
-            return res.status(400).send({ error: 'Please provide the form name for the search.' });
+        // Construct the query based on the provided conditions
+        const query = {};
+        if (titleRegExp) {
+            query.title = titleRegExp;
+        }
+        if (departmentRegExp) {
+            query.department = departmentRegExp;
         }
 
-        // Create a case-insensitive regular expression for the form name
-        const titleRegExp = new RegExp(title, 'i');
+        // Search for articles in the database using the constructed query
+        const foundArticles = await Article.find(query);
 
-        // Search for forms by name in the database using the regular expression
-        const foundArticles = await Article.find({ name: titleRegExp });
-
-        // Respond with the found forms
+        // Respond with the found articles
         return res.status(200).send(foundArticles);
 
     } catch (error) {
@@ -248,6 +254,7 @@ module.exports.getArticleByTitle = async (req, res) => {
 
     }
 };
+
 
 module.exports.getArticleByCategory = async (req, res) => {
     //the ideal logic for this query controller is to retrieve articles by "Category" and "Title" (optional). "Title" is optional.

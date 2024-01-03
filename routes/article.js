@@ -13,7 +13,7 @@ router.put('/article/edit/:articleId',verify, verifyManager,uploadMultipleImage,
 router.delete('/article/edit/deleteImage/:articleId',verify, verifyManager,deleteImage,articleController.removeArticleImage)
 router.put('/article/edit/addImage/:articleId',verify, verifyManager,uploadMultipleImage,articleController.addArticleImage)
 router.get('/',verify, articleController.getAllArticle)
-router.post('/article',verify, articleController.getArticleByTitle)
+router.post('/article',verify, articleController.getArticleByTitleAndDepartment)
 router.get('/article/:articleId',verify, articleController.getArticleById)
 
 module.exports = router;
