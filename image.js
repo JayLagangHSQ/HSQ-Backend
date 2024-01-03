@@ -58,7 +58,7 @@ module.exports.uploadMultipleImage = (req, res, next) => {
 				console.log('stopped here in middleware')
 				return res.status(500).send({error : "server error"});
 			}
-			console.log(req.files)
+
 			const uploadedImages = [];
 			
 			for (const file of req.files) {
@@ -76,7 +76,7 @@ module.exports.uploadMultipleImage = (req, res, next) => {
 
 			// Attach the uploaded image keys to the req object
 			req.uploadedImages = uploadedImages;
-			console.log(`${uploadedImages}: uploadedImages`)
+
 			next();
 		});
 		

@@ -188,6 +188,38 @@ module.exports.removeArticleImage = async(req,res) => {
     }
 }
 
+module.exports.addArticleImage = async(req,res) =>{
+
+    const {articleId} = req.params;
+    const articleImageKey = req.uploadedImages;
+    
+    try{
+        const article = await Article.findById(articleId);
+
+        // Check if product and productImageKey are valid
+        if (!article || !articleImageKey || !Array.isArray(articleImageKey)) {
+            return res.status(400).send({message: 'Invalid product or productImageKey'});
+        }
+
+        // Iterate through the productImageKey array and push each object's imageKey to product.productImageKey
+        articleImageKey.forEach((imageObject) => {
+            if (imageObject.key) {
+                article.imageKeys.push({ key: imageObject.key });
+            }
+        });
+        console.log(article)
+        console.log(articleImageKey)
+        // Save the updated product
+        await article.save();
+
+        return res.status(200).send(true);
+
+    } catch(err){
+        console.log(err)
+        return res.status(500).send(false)
+    }
+}
+
 module.exports.getArticleByTitle = async (req, res) => {
     
     try {
