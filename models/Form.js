@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const formSchema = new mongoose.Schema({
-    category: String,
+    department: String,
     subcategory: String,
     name: String,
     description:String,

@@ -3,16 +3,17 @@ const Form = require('../models/Form')
 module.exports.addNewForm = async (req, res) => {
     try {
         // Extract form data from the request body
-        const { name, description, link } = req.body;
+        const { name, description, department, link } = req.body;
 
         // Validate if required fields are present
-        if (!name || !description || !link) {
+        if (!name || !description || !link || !department) {
             return res.status(400).send({ error: 'Please provide name, description, and link.' });
         }
 
         // Create a new form instance
         const newForm = new Form({
             name,
+            department,
             description,
             link,
         });
@@ -31,11 +32,11 @@ module.exports.addNewForm = async (req, res) => {
 module.exports.editForm = async (req, res) => {
     try {
         // Extract form data from the request body
-        const { name, description, link, formId } = req.body;
+        const { name, description, link,department, formId } = req.body;
         //const formId = req.params.id; // Assuming you have a route parameter for the form ID
 
         // Validate if required fields are present
-        if (!name || !description || !link) {
+        if (!name || !description || !link || !department) {
             return res.status(400).send({ error: 'Please provide name, description, and link.' });
         }
 
@@ -51,6 +52,7 @@ module.exports.editForm = async (req, res) => {
         existingForm.name = name;
         existingForm.description = description;
         existingForm.link = link;
+        existingForm.department = department;
 
         // Save the updated form to the database
         await existingForm.save();
@@ -93,6 +95,40 @@ module.exports.getFormsByName = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).send({ error: 'Internal Server Error' });
+    }
+};
+module.exports.getFormByNameAndDepartment = async (req, res) => {
+    
+    try {
+        // Extract title and department from the request body
+        let { name, department } = req.body;
+        
+        // Create a case-insensitive regular expression for the title
+        const nameRegExp = name ? new RegExp(name, 'i') : null;
+
+        // Create a case-insensitive regular expression for the department
+        const departmentRegExp = department ? new RegExp(department, 'i') : null;
+
+        // Construct the query based on the provided conditions
+        const query = {};
+        if (nameRegExp) {
+            query.name = nameRegExp;
+        }
+        if (departmentRegExp) {
+            query.department = departmentRegExp;
+        }
+
+        // Search for forms in the database using the constructed query
+        const foundForms = await Form.find(query);
+
+        // Respond with the found forms
+        return res.status(200).send(foundForms);
+
+    } catch (error) {
+
+        console.error(error);
+        return res.status(500).send({ error: 'Internal Server Error' });
+
     }
 };
 
