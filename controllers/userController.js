@@ -71,6 +71,35 @@ module.exports.getUserDetail = (req, res) => {
     }
 };
 
+
+module.exports.updatePassword = async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const { id } = req.user;
+  
+      // Fetching the current user from the database
+      const currentUser = await User.findById(id);
+  
+      // Checking if the current password provided matches the one in the database
+      const isPasswordMatch = await bcrypt.compare(currentPassword, currentUser.password);
+  
+      if (!isPasswordMatch) {
+        return res.status(401).send({ message: 'Current password is incorrect' });
+      }
+  
+      // Hashing the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+  
+      // Updating the user's password in the database
+      await User.findByIdAndUpdate(id, { password: hashedPassword });
+  
+      // Sending a success response
+      res.status(200).send({ message: 'Password updated successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: 'Internal server error' });
+    }
+  };
 //first created a system that will make sure the timezone being used for every clock-in is in GMT and not the timezone used by the local computer of the user.
 //Then created the necessary models for the user.
 

@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'Edit my ID Number'
     },
+    profilePictureKey:String,
     department:{
         type:String,
         require: [true, 'department is required']
@@ -24,6 +25,10 @@ const userSchema = new mongoose.Schema({
     isManager:{
         type: Boolean,
         default: false
+    },
+    isEditor:{
+        type: Boolean,
+        default:false
     },
     email: {
         type: String,
