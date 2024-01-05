@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'email is required']
     },
+    personalEmail:String,
     mobileNo: {
         type: String,
         required: [true, 'mobileNo is required']
