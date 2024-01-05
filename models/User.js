@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'Edit my ID Number'
     },
-    profilePictureKey:String,
+    profilePictureKey:{},
+    profilePictureUrl:String,
     department:{
         type:String,
         require: [true, 'department is required']

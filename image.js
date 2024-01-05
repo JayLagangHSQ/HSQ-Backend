@@ -12,6 +12,7 @@ const s3Client = new S3Client({
 	},
 });
 const bucketName = dotenv.BUCKET_NAME;
+const employeePictureBucket = dotenv.EMPLOYEE_PICTURE_BUCKET;
 
 let randomImageNamer = (bytes = 32) => crypto.randomBytes(16).toString('hex');
 
@@ -21,15 +22,16 @@ const upload = multer({ storage: storage });
 
 
 // Handle the image upload - for single image only
-module.exports.uploadImage = async (req, res, next) => {
+module.exports.uploadProfileImage = async (req, res, next) => {
 	try {
 		// Assuming 'upload' is properly configured with multer for handling file uploads
 		upload.single('image')(req, res, async (err) => {
+			
 			if (err) {
 				return res.status(500).send(false);
 			}
 			const params = {
-				Bucket: bucketName,
+				Bucket: employeePictureBucket,
 				Key: randomImageNamer(), // Set a unique key for the file
 				Body: req.file.buffer
 			};
@@ -46,6 +48,46 @@ module.exports.uploadImage = async (req, res, next) => {
 		return res.status(500).send(false);
 	}
 };
+module.exports.deleteProfileImage = async (req, res, next) => {
+    try {
+        const { key } = req.body; // Assuming the image key is passed in the request body
+
+		if(key == null || key == undefined || key == ''){
+			return next();
+		}
+
+        const params = {
+            Bucket: bucketName,
+            Key: key,
+        };
+
+        const deleteObjectCommand = new DeleteObjectCommand(params);
+        await s3Client.send(deleteObjectCommand);
+		
+		req.deletedImageKey = {
+			key: key
+		};
+        next();
+    } catch (deleteErr) {
+        return res.status(500).send({ error: deleteErr });
+    }
+};
+module.exports.retrieveProfileImageUrl = async (objectKey) => {
+
+	const params = {
+		Bucket: employeePictureBucket,
+		Key: objectKey
+	};
+
+	try {
+		const getObjectCommand = new GetObjectCommand(params);
+		const signedUrl = await getSignedUrl(s3Client, getObjectCommand, { expiresIn: 3600 }); // Set expiration time in seconds
+
+		return signedUrl;
+	} catch (err) {
+		return res.status(500).send(false);
+	}
+}
 
 
 // Handle the image upload - for multiple image upload

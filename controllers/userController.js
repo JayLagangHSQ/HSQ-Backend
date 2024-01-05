@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const auth = require('../auth');
 const time = require('../util/timeWatcher');
 const isWorkingTime = require('../util/workScheduleValidator')
+const image = require('../image');
+const {retrieveProfileImageUrl} = image;
 
 module.exports.loginUser = async (req, res) => {
     try {
@@ -59,18 +61,42 @@ module.exports.registerUser = async (req, res) => {
     }
 }
 
-module.exports.getUserDetail = (req, res) => {
+module.exports.getUserDetail = async (req, res) => {
     try {
-        return User.findById(req.user.id)
-            .then(result => {
-                result.password = "";
-                return res.status(200).send({result});
-            });
+        const result = await User.findById(req.user.id);
+        if (result) {
+            result.password = "";
+            let signedUrl = await retrieveProfileImageUrl(result.profilePictureKey.key)
+            result.profilePictureUrl = signedUrl;
+            return res.status(200).send({ result });
+
+        } else {
+            return res.status(404).send({ error: "User not found" });
+        }
     } catch (err) {
+        console.error(err);
         return res.status(500).send({ error: "Server Error" });
     }
 };
 
+module.exports.updateProfilePicture = async(req, res) =>{
+    
+    try{
+        const profilePictureKey = req.objectKey;
+        const {id} = req.user;
+
+        const profile = await User.findById(id);
+        console.log(profile)
+        profile.profilePictureKey = {key: profilePictureKey}
+        
+        await profile.save();
+
+        return res.status(200).send({ message: 'Profile picture updated successfully' });
+    } catch(err){
+        console.error(err);
+        return res.status(500).send({ message: 'Internal server error' });
+    }
+}
 
 module.exports.updatePassword = async (req, res) => {
     try {
@@ -94,10 +120,10 @@ module.exports.updatePassword = async (req, res) => {
       await User.findByIdAndUpdate(id, { password: hashedPassword });
   
       // Sending a success response
-      res.status(200).send({ message: 'Password updated successfully' });
+      return res.status(200).send({ message: 'Password updated successfully' });
     } catch (error) {
       console.error(error);
-      res.status(500).send({ message: 'Internal server error' });
+      return res.status(500).send({ message: 'Internal server error' });
     }
   };
 //first created a system that will make sure the timezone being used for every clock-in is in GMT and not the timezone used by the local computer of the user.
