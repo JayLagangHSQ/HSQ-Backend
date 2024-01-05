@@ -86,7 +86,7 @@ module.exports.updateProfilePicture = async(req, res) =>{
         const {id} = req.user;
 
         const profile = await User.findById(id);
-        console.log(profile)
+
         profile.profilePictureKey = {key: profilePictureKey}
         
         await profile.save();
@@ -153,8 +153,6 @@ module.exports.clockIn = async (req, res) => {
 
         }
 
-        // console.log(`timesheet length is: ${user.timeSheet.length}`)
-        // console.log(newDay.date)
         return res.send(currentTime)
         
     } catch (err) {

@@ -26,7 +26,8 @@ module.exports.uploadProfileImage = async (req, res, next) => {
 	try {
 		// Assuming 'upload' is properly configured with multer for handling file uploads
 		upload.single('image')(req, res, async (err) => {
-			
+			const { key } = req.body; // Assuming the image key is passed in the request body
+			req.key = key;
 			if (err) {
 				return res.status(500).send(false);
 			}
@@ -50,14 +51,12 @@ module.exports.uploadProfileImage = async (req, res, next) => {
 };
 module.exports.deleteProfileImage = async (req, res, next) => {
     try {
-        const { key } = req.body; // Assuming the image key is passed in the request body
-
+        const key  = req.key; // Assuming the image key is passed in the request body
 		if(key == null || key == undefined || key == ''){
 			return next();
 		}
-
         const params = {
-            Bucket: bucketName,
+            Bucket: employeePictureBucket,
             Key: key,
         };
 
@@ -67,6 +66,7 @@ module.exports.deleteProfileImage = async (req, res, next) => {
 		req.deletedImageKey = {
 			key: key
 		};
+
         next();
     } catch (deleteErr) {
         return res.status(500).send({ error: deleteErr });
@@ -85,7 +85,7 @@ module.exports.retrieveProfileImageUrl = async (objectKey) => {
 
 		return signedUrl;
 	} catch (err) {
-		return res.status(500).send(false);
+		return false
 	}
 }
 
@@ -97,7 +97,6 @@ module.exports.uploadMultipleImage = (req, res, next) => {
 		
 		upload.array('images')(req, res, async (err) => {
 			if (err) {
-				console.log('stopped here in middleware')
 				return res.status(500).send({error : "server error"});
 			}
 
@@ -142,7 +141,8 @@ module.exports.retrieveImageUrl = async (objectKey) => {
 
 		return signedUrl;
 	} catch (err) {
-		return res.status(500).send(false);
+		
+		return false
 	}
 }
 
