@@ -10,6 +10,7 @@ router.post("/login",  userController.loginUser);
 router.post("/register",  userController.registerUser);
 router.get("/user/detail", verify, userController.getUserDetail);
 router.put('/user/profilePicture/update', verify,uploadProfileImage, deleteProfileImage, userController.updateProfilePicture);
+router.put("/user/update/mobileNo", verify, userController.updateMobileNo)
 router.put("/user/passwordUpdate", verify, userController.updatePassword);
 router.post('/user/clockIn', verify, userController.clockIn);
 
