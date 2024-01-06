@@ -114,6 +114,21 @@ module.exports.updateMobileNo = async (req,res) =>{
     
 }
 
+module.exports.updatePersonalEmail = async (req,res) =>{
+    try{
+        const { id } = req.user;
+        const {newEmail} = req.body;
+
+        await User.findByIdAndUpdate(id, { personalEmail: newEmail });
+
+        return res.status(200).send(true)
+    } catch(err){
+        console.error(err);
+        return res.status(500).send({ message: 'Internal server error' });
+    }
+    
+}
+
 module.exports.updatePassword = async (req, res) => {
     try {
       const { currentPassword, newPassword } = req.body;
