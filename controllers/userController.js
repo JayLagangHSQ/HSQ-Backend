@@ -68,6 +68,7 @@ module.exports.getUserDetail = async (req, res) => {
             result.password = "";
             let signedUrl = await retrieveProfileImageUrl(result.profilePictureKey.key)
             result.profilePictureUrl = signedUrl;
+            result.department = result.department.toLocaleUpperCase();
             return res.status(200).send({ result });
 
         } else {
