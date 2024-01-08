@@ -79,7 +79,68 @@ module.exports.getUserDetail = async (req, res) => {
         return res.status(500).send({ error: "Server Error" });
     }
 };
+module.exports.retrieveUserByNameAndDepartment = async(req, res) =>{
+    try {
+        // Extract name and department from the request body
+        let { firstName,lastName, department } = req.body;
 
+        // Create a case-insensitive regular expression for the name
+        const firstNameRegExp = firstName ? new RegExp(firstName, 'i') : null;
+
+        const lastNameRegExp = lastName ? new RegExp(lastName, 'i') : null;
+
+        // Create a case-insensitive regular expression for the department
+        const departmentRegExp = department ? new RegExp(department, 'i') : null;
+
+        // Construct the query based on the provided conditions
+        const query = {};
+        if (firstNameRegExp) {
+            query.firstName = firstNameRegExp;
+        }
+        if (lastNameRegExp){
+            query.lastName = lastNameRegExp;
+        }
+        if (departmentRegExp) {
+            query.department = departmentRegExp;
+        }
+
+        // Search for users in the database using the constructed query
+        const foundUsers = await User.find(query);
+
+        // Generate signed URLs for profile pictures and update each user object
+        const usersWithSignedUrls = await Promise.all(
+            foundUsers.map(async (user) => {
+                if (!user.profilePictureKey || !user.profilePictureKey.key) {
+                    // Skip users with undefined profilePictureKey.key
+                    user = user.toObject(); // Convert to plain JavaScript object
+                    user.password = ""; // Remove sensitive information
+                    user.profilePictureUrl = null;
+                    user.department = user.department.toLocaleUpperCase();
+
+                    return user; 
+                }
+
+                user = user.toObject(); // Convert to plain JavaScript object
+                user.password = ""; // Remove sensitive information
+
+                // Generate signed URL for profile picture
+                let signedUrl = await retrieveProfileImageUrl(user.profilePictureKey.key);
+                user.profilePictureUrl = signedUrl;
+
+                // Ensure 'department' is uppercased
+                user.department = user.department.toLocaleUpperCase();
+
+                return user;
+            })
+        );
+
+        // Respond with the found users including signed URLs
+        return res.status(200).send(usersWithSignedUrls);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ error: 'Internal Server Error' });
+    }
+}
 module.exports.updateProfilePicture = async(req, res) =>{
     
     try{

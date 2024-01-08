@@ -156,7 +156,7 @@ module.exports.removeArticleImage = async(req,res) => {
 
     const {articleId} = req.params;
     const imageKey = req.deletedImageKey;
-    console.log(articleId)
+
     try {
         const article = await Article.findById(articleId);
 
@@ -165,10 +165,10 @@ module.exports.removeArticleImage = async(req,res) => {
             return res.status(404).send({ error: 'Article not found' });
         }
 
-        console.log(article)
+
         // Find the index of the image key in the product's image keys array
         const imageIndex = article.imageKeys.findIndex(img => img.key === imageKey.key);
-        console.log(imageIndex)
+
 
         // If the image key is found, remove it from the array
         if (imageIndex !== -1) {
@@ -207,8 +207,7 @@ module.exports.addArticleImage = async(req,res) =>{
                 article.imageKeys.push({ key: imageObject.key });
             }
         });
-        console.log(article)
-        console.log(articleImageKey)
+
         // Save the updated product
         await article.save();
 

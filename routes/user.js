@@ -14,5 +14,5 @@ router.put("/user/update/mobileNo", verify, userController.updateMobileNo)
 router.put("/user/update/personalEmail", verify, userController.updatePersonalEmail)
 router.put("/user/passwordUpdate", verify, userController.updatePassword);
 router.post('/user/clockIn', verify, userController.clockIn);
-
+router.post('/search', verify, userController.retrieveUserByNameAndDepartment)
 module.exports = router;
