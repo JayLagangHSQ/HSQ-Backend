@@ -5,7 +5,6 @@ const {verify, verifyManager}  = auth;
 const image =require('../image');
 const {uploadProfileImage, deleteProfileImage} = image;
 const router = express.Router();
-
 router.post("/login",  userController.loginUser);
 router.post("/register",  userController.registerUser);
 router.get("/user/detail", verify, userController.getUserDetail);

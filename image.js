@@ -13,13 +13,12 @@ const s3Client = new S3Client({
 });
 const bucketName = dotenv.BUCKET_NAME;
 const employeePictureBucket = dotenv.EMPLOYEE_PICTURE_BUCKET;
-
 let randomImageNamer = (bytes = 32) => crypto.randomBytes(16).toString('hex');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-
+// HERE I JUST REALIZED THAT I'M NOT FOLLOWING THE DRY PRINCIPLE
 
 // Handle the image upload - for single image only
 module.exports.uploadProfileImage = async (req, res, next) => {
@@ -91,7 +90,10 @@ module.exports.retrieveProfileImageUrl = async (objectKey) => {
 
 
 // Handle the image upload - for multiple image upload
-module.exports.uploadMultipleImage = (req, res, next) => {
+module.exports.uploadMultipleImage = (customParameter) => (req, res, next) => {
+	let actualBucketName;
+
+	!customParameter ? actualBucketName=bucketName : actualBucketName = customParameter;
 	
 	try {
 		
@@ -104,7 +106,7 @@ module.exports.uploadMultipleImage = (req, res, next) => {
 			
 			for (const file of req.files) {
 				const params = {
-					Bucket: bucketName,
+					Bucket: actualBucketName,
 					Key: randomImageNamer(), // Use the randomImageNamer() function for a unique key
 					Body: file.buffer,
 				};
@@ -132,6 +134,24 @@ module.exports.retrieveImageUrl = async (objectKey) => {
 
 	const params = {
 		Bucket: bucketName,
+		Key: objectKey
+	};
+
+	try {
+		const getObjectCommand = new GetObjectCommand(params);
+		const signedUrl = await getSignedUrl(s3Client, getObjectCommand, { expiresIn: 3600 }); // Set expiration time in seconds
+
+		return signedUrl;
+	} catch (err) {
+		
+		return false
+	}
+}
+
+module.exports.retrieveImageUrlUniversal = async (bucket,objectKey) => {
+
+	const params = {
+		Bucket: bucket,
 		Key: objectKey
 	};
 

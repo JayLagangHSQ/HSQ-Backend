@@ -52,6 +52,20 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    notifications:{
+        unread:[
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref:'NewsAndUpdate'
+            }
+        ],
+        read:[
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref:'NewsAndUpdate'
+            }
+        ]
+    },
     managerResource:{
         humanResource:[
             {
