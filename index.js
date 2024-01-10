@@ -7,7 +7,7 @@ const form = require("./routes/form");
 const article = require("./routes/article");
 const link = require("./routes/link")
 const newsAndUpdate = require("./routes/newsAndUpdate")
-const {instantaneous} = require('./util/instantaneous')
+// const {instantaneous} = require('./util/instantaneous')
 const app = express();
 const port = 4005;
 
@@ -37,7 +37,7 @@ app.use('/api/links', link)
 app.use('/api/newsAndUpdates', newsAndUpdate)
 
 //socket.io middleware for real-time features
-instantaneous();
+// instantaneous();
 
 if(require.main === module) {
   app.listen(port, () => console.log(`Server is running at port ${port}`));
