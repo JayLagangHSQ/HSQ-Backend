@@ -13,6 +13,10 @@ const newsAndUpdateSchema = new mongoose.Schema({
         type:String,
         required:[true, 'message is required']
     },
+    department:{
+        type:String,
+        required:[true, 'department is required']
+    },
     imageKeys:[],
     imageUrl:[],
     originalPostDate: Date,

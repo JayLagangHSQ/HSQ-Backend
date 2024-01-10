@@ -6,7 +6,7 @@ const {retrieveImageUrlUniversal, retrieveProfileImageUrl} = image;
 const newsAndUpdateBucket = dotenv.NEWS_AND_UPDATE_BUCKET;
 
 module.exports.postNewsAndUpdate = async(req,res) =>{
-    const {title, message} = req.body
+    const {title, message, department} = req.body
     const imageKeys = req.uploadedImages;
     const author = req.user.id;
     const originalPostDate = new Date().toISOString()
@@ -14,14 +14,18 @@ module.exports.postNewsAndUpdate = async(req,res) =>{
 
     try{
 
-        if (!title || !message || !originalPostDate) {
-            return res.status(400).send({ error: 'Please provide title, message, and originalPostDate.' });
+        if (!title || !message || !department ||!originalPostDate) {
+            return res.status(400).send({ error: 'Please provide title, message, department, and originalPostDate.' });
         }
+        
+        // Convert department to lowercase
+        const lowercasedDepartment = department.toLowerCase();
 
         const newNewsAndUpdates = new NewsAndUpdate({
             author,
             title,
             message,
+            department: lowercasedDepartment,
             imageKeys,
             originalPostDate,
             latestUpdate
