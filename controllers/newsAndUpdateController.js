@@ -1,48 +1,64 @@
 const NewsAndUpdate = require("../models/NewsAndUpdate");
+const User = require("../models/User")
 const image = require('../image');
 const dotenv = require('dotenv').config().parsed;
 const {retrieveImageUrlUniversal, retrieveProfileImageUrl} = image;
 
 const newsAndUpdateBucket = dotenv.NEWS_AND_UPDATE_BUCKET;
 
-module.exports.postNewsAndUpdate = async(req,res) =>{
-    const {title, message, department} = req.body
+module.exports.postNewsAndUpdate = async (req, res) => {
+    const { title, message, department } = req.body;
     const imageKeys = req.uploadedImages;
     const author = req.user.id;
-    const originalPostDate = new Date().toISOString()
-    const latestUpdate = new Date().toISOString()
-
-    try{
-
-        if (!title || !message || !department ||!originalPostDate) {
-            return res.status(400).send({ error: 'Please provide title, message, department, and originalPostDate.' });
+    const originalPostDate = new Date().toISOString();
+    const latestUpdate = new Date().toISOString();
+  
+    try {
+      if (!title || !message || !department || !originalPostDate) {
+        return res
+          .status(400)
+          .send({ error: 'Please provide title, message, department, and originalPostDate.' });
+      }
+  
+      const allUsers = await User.find();
+      // Convert department to lowercase
+      const lowercasedDepartment = department.toLowerCase();
+  
+      const newNewsAndUpdates = new NewsAndUpdate({
+        author,
+        title,
+        message,
+        department: lowercasedDepartment,
+        imageKeys,
+        originalPostDate,
+        latestUpdate,
+      });
+  
+      // Save the form to the database
+      await newNewsAndUpdates.save();
+  
+      // Update users' notifications based on department
+      for (const eachUser of allUsers) {
+        if (lowercasedDepartment === 'company-wide') {
+          // If department is "company-wide", push the newNewsAndUpdates to all users
+          eachUser.notifications.unread.push(newNewsAndUpdates._id);
+        } else if (lowercasedDepartment === eachUser.department) {
+          // If department matches each user's department, push to their notifications
+          eachUser.notifications.unread.push(newNewsAndUpdates._id);
         }
-        
-        // Convert department to lowercase
-        const lowercasedDepartment = department.toLowerCase();
-
-        const newNewsAndUpdates = new NewsAndUpdate({
-            author,
-            title,
-            message,
-            department: lowercasedDepartment,
-            imageKeys,
-            originalPostDate,
-            latestUpdate
-        });
-
-        // Save the form to the database
-        await newNewsAndUpdates.save();
-
-        // Respond with the newly created form
-        return res.status(201).send(true);
-
-    } catch(err){
-
-        console.error(err);
-        return res.status(500).send({ error: 'Internal Server Error' });
+      }
+  
+      // Save the updated user notifications
+      await Promise.all(allUsers.map((user) => user.save()));
+  
+      // Respond with the newly created form
+      return res.status(201).send(true);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send({ error: 'Internal Server Error' });
     }
-}
+  };
+  
 
 module.exports.editNewsAndUpdate = async(req, res) =>{
     const {title, message} = req.body
