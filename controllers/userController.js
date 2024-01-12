@@ -218,6 +218,45 @@ module.exports.updatePassword = async (req, res) => {
       return res.status(500).send({ message: 'Internal server error' });
     }
   };
+
+
+  module.exports.acknowledgeUpdate = async (req, res) => {
+    const { id } = req.user;
+    const { newsAndUpdateId } = req.body;
+
+    console.log(id)
+    console.log(newsAndUpdateId)
+
+    try {
+        const foundUser = await User.findById(id);
+
+        if (!foundUser) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+
+        // Check if the newsAndUpdateId is in the unread array
+        const unreadIndex = foundUser.notifications.unread.indexOf(newsAndUpdateId);
+
+        if (unreadIndex !== -1) {
+            // Remove the id from the unread array
+            foundUser.notifications.unread.splice(unreadIndex, 1);
+
+            // Push the id to the read array
+            foundUser.notifications.read.push(newsAndUpdateId);
+
+            // Save the updated user object
+            await foundUser.save();
+
+            return res.status(200).send({ message: 'Update acknowledged successfully' });
+        } else {
+            return res.status(400).send({ message: 'News and update id not found in unread notifications' });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send({ message: 'Internal server error' });
+    }
+};
+  
 //first created a system that will make sure the timezone being used for every clock-in is in GMT and not the timezone used by the local computer of the user.
 //Then created the necessary models for the user.
 

@@ -14,4 +14,5 @@ router.put("/user/update/personalEmail", verify, userController.updatePersonalEm
 router.put("/user/passwordUpdate", verify, userController.updatePassword);
 router.post('/user/clockIn', verify, userController.clockIn);
 router.post('/search', verify, userController.retrieveUserByNameAndDepartment)
+router.put('/user/acknowledgeUpdate', verify, userController.acknowledgeUpdate)
 module.exports = router;
