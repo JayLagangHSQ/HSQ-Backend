@@ -224,9 +224,6 @@ module.exports.updatePassword = async (req, res) => {
     const { id } = req.user;
     const { newsAndUpdateId } = req.body;
 
-    console.log(id)
-    console.log(newsAndUpdateId)
-
     try {
         const foundUser = await User.findById(id);
 

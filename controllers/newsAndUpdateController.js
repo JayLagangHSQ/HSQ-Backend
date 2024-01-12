@@ -61,13 +61,13 @@ module.exports.postNewsAndUpdate = async (req, res) => {
   
 
 module.exports.editNewsAndUpdate = async(req, res) =>{
-    const {title, message} = req.body
-    const { newsAndUpdateId } = req.params;
+    const { id } = req.user;
+    const {title, message,department, newsAndUpdateId} = req.body
     const latestUpdate = new Date().toISOString()
-    
+    console.log(req.body)
     try{
 
-        if (!title || !message || !latestUpdate) {
+        if (!title || !message || !latestUpdate || !department) {
             return res.status(400).send({ error: 'Please provide title, message, and originalPostDate.' });
         }
         // Find the form by ID
@@ -77,9 +77,13 @@ module.exports.editNewsAndUpdate = async(req, res) =>{
         if (!existingNewsAndUpdate) {
             return res.status(404).send({ error: 'Form not found.' });
         }
-
+        if(existingNewsAndUpdate.author.toString() !== id){
+            return res.status(401).send({ error: 'User is not authorized to edit' });
+        }
+        
         existingNewsAndUpdate.title = title;
         existingNewsAndUpdate.message = message;
+        existingNewsAndUpdate.department = department;
 
         // Save to the database
         await existingNewsAndUpdate.save();

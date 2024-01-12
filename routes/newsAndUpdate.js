@@ -13,7 +13,7 @@ const newsAndUpdateBucket = dotenv.NEWS_AND_UPDATE_BUCKET;
 
 router.get('/', verify, newsAndUpdateController.retrieveAllNewsAndUpdate)
 router.post('/upload',verify, verifyManager, uploadMultipleImage(newsAndUpdateBucket), newsAndUpdateController.postNewsAndUpdate)
-router.put('/:newsAndUpdateId/edit', verify, verifyManager, newsAndUpdateController.editNewsAndUpdate)
+router.put('/edit', verify, verifyManager, newsAndUpdateController.editNewsAndUpdate)
 
 
 module.exports = router;
