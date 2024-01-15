@@ -31,7 +31,7 @@ module.exports.addNewArticle = async (req, res) => {
         await newArticle.save();
 
         // Respond with the newly created form
-        return res.status(201).send(true);
+        return res.status(201).send({ _id: newArticle._id })
     } catch (error) {
         console.error(error);
         return res.status(500).send({ error: 'Internal Server Error' });
