@@ -1,5 +1,6 @@
 const dotenv = require('dotenv').config();
 const express = require("express");
+const session = require('express-session');
 const mongoose = require("mongoose");
 const cors = require("cors");
 const user = require("./routes/user");
@@ -7,6 +8,7 @@ const form = require("./routes/form");
 const article = require("./routes/article");
 const link = require("./routes/link")
 const newsAndUpdate = require("./routes/newsAndUpdate")
+const mail = require("./routes/mail")
 // const {instantaneous} = require('./util/instantaneous')
 const app = express();
 const port = 4005;
@@ -18,6 +20,11 @@ app.use(cors({
 	origin: '*'
 }))
 
+app.use(session({
+  secret: dotenv.parsed.sessionSecret,
+  resave: true,
+  saveUninitialized: true
+}));
 
 // Database connection
 const mongodbPass = dotenv.parsed.MONGO_DB_ADMIN_PASS;
@@ -35,7 +42,7 @@ app.use('/api/forms', form);
 app.use('/api/articles', article);
 app.use('/api/links', link)
 app.use('/api/newsAndUpdates', newsAndUpdate)
-
+app.use('/api/mails', mail);
 //socket.io middleware for real-time features
 // instantaneous();
 
