@@ -105,11 +105,10 @@ module.exports.generateResetPasswordToken = async (req, res) => {
         const resetToken = jwt.sign({ email }, dotenv.parsed.sessionSecret, { expiresIn: '5m' });
 
         // Store reset token in session (for demonstration purposes, you might want to store it in a more secure way)
-        req.session.resetToken = resetToken;
+        
 
         // Send the reset token to the user's email (you can use Nodemailer here as well)
-        sendResetToken(req.session.resetToken, email);
-
+        sendResetToken(resetToken, email);
         res.status(200).send('Reset token sent. Check your email.');
     } catch (error) {
         console.error('Error generating reset token:', error);
@@ -123,6 +122,8 @@ module.exports.verifyResetPasswordToken = async(req,res) =>{
   try {
     // Verify the token against the secret key
     const decoded = jwt.verify(token, dotenv.parsed.sessionSecret);
+
+    req.session.resetToken = token;
 
     res.status(200).send(true);
     
