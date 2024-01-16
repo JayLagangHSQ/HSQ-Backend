@@ -123,8 +123,6 @@ module.exports.verifyResetPasswordToken = async(req,res) =>{
     // Verify the token against the secret key
     const decoded = jwt.verify(token, dotenv.parsed.sessionSecret);
 
-    req.session.resetToken = token;
-
     res.status(200).send(true);
     
     
@@ -134,11 +132,13 @@ module.exports.verifyResetPasswordToken = async(req,res) =>{
 }
 
 module.exports.resetPassword = async(req, res) =>{
-    try {
         const { newPassword } = req.body;
+        let token = req.headers.authorization
+    try {
+        
+        token = token.slice(7, token.length);
 
-
-        const decoded = jwt.verify(req.session.resetToken, dotenv.parsed.sessionSecret);
+        const decoded = jwt.verify(token, dotenv.parsed.sessionSecret);
         
         const user = await User.findOne({ email: decoded.email }); // Find user by email
 
@@ -151,7 +151,6 @@ module.exports.resetPassword = async(req, res) =>{
 
         // Update the user's password
         await User.findByIdAndUpdate(user._id, { password: hashedPassword });
-        delete req.session.resetToken;
         // Sending a success response
         return res.status(200).send({ message: 'Password updated successfully' });
         
