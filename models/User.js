@@ -76,11 +76,11 @@ const userSchema = new mongoose.Schema({
     },
     scheduledWorkHour:{
         workDays:{
-            start:{
+            offOne:{
                 type: Number,
                 default: 1
             },
-            end:{
+            offTwo:{
                 type: Number,
                 default: 5
             }

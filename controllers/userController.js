@@ -260,53 +260,69 @@ module.exports.updatePassword = async (req, res) => {
 module.exports.clockIn = async (req, res) => {
     const { id } = req.user;
     try {
-        // Assuming you have some form of authentication and you can get the user ID from the request
-        const userId = id;
-    
-        // Check if the user is already clocked in
-        const user = await User.findById(userId);
-        
-        // Get current time in UK timezone
-        const ukTimeNow = new Date().toLocaleString('en-US', { timeZone: 'Europe/London' });
-        const currentDate = new Date(ukTimeNow).toDateString();
-    
-        // Check if the user is already clocked in on the current date
-        const alreadyClockedIn = user.timeSheet.some(entry => {
-          const entryDate = new Date(entry.date).toDateString();
-          return entryDate === currentDate;
-        });
-    
-        if (alreadyClockedIn) {
-          return res.status(400).json({ error: 'User is already clocked in on this date.' });
-        }
-    
-        // Get the user's scheduled work start time
-        const scheduledStartTime = new Date(ukTimeNow);
-        scheduledStartTime.setHours(user.scheduledWorkHour.workHours.start);
-        scheduledStartTime.setMinutes(user.scheduledWorkHour.workMinute.minute);
-    
-        // Update the user's timeSheet with the clock-in timestamp and set status based on lateness
-        const clockInTime = new Date(ukTimeNow);
-        const status = clockInTime > scheduledStartTime ? 'late' : 'pending';
-    
-        user.timeSheet.push({
-          date: clockInTime,
-          status: status,
-          clockIn: clockInTime,
-        });
-    
-        // Set isClockedIn to true
-        user.isClockedIn = true;
-    
-        // Save the updated user document
-        await user.save();
-    
-        return res.status(200).json({ message: `Clock-in successful. Status: ${status}` });
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+      // Assuming you have some form of authentication and you can get the user ID from the request
+      const userId = id;
+
+      // Check if the user is already clocked in
+      const user = await User.findById(userId);
+
+      // Get current time in UK timezone
+      const ukTimeNow = new Date().toLocaleString('en-US', { timeZone: 'Europe/London' });
+      const currentDate = new Date(ukTimeNow);
+
+      // Check if it's a weekend
+      if (currentDate.getDay() === user.scheduledWorkHour.workDays.offOne || currentDate.getDay() === user.scheduledWorkHour.workDays.offTwo) {
+ 
+        return res.status(400).json({ error: 'Cannot clock in during non-working days.' });
       }
-}
+
+      // Calculate scheduled start time allowing 30 minutes prior
+      const scheduledStartTime = new Date(ukTimeNow);
+      scheduledStartTime.setHours(user.scheduledWorkHour.workHours.start);
+      scheduledStartTime.setMinutes(user.scheduledWorkHour.workMinute.minute);
+
+      // Check if it's outside the allowable clock-in window
+      if (currentDate < scheduledStartTime) {
+        return res.status(400).json({ error: 'Cannot clock in before 30 minutes prior to work hours.' });
+      }
+
+      // Check if the user is already clocked in on the current date
+      const alreadyClockedIn = user.timeSheet.some((entry) => {
+        const entryDate = new Date(entry.date).toDateString();
+        return entryDate === currentDate.toDateString();
+      });
+
+      if (alreadyClockedIn) {
+        return res.status(400).json({ error: 'User is already clocked in on this date.' });
+      }
+
+      // Get the user's scheduled work start time
+      const workStart = user.scheduledWorkHour.workHours.start;
+      const workEnd = user.scheduledWorkHour.workHours.end;
+  
+      // Update the user's timeSheet with the clock-in timestamp and set status based on lateness
+      const clockInTime = new Date(ukTimeNow);
+      const status = clockInTime > new Date(ukTimeNow).setHours(workStart) ? 'late' : 'pending';
+  
+      user.timeSheet.unshift({
+        date: clockInTime,
+        status: status,
+        clockIn: clockInTime,
+      });
+  
+      // Set isClockedIn to true
+      user.isClockedIn = true;
+  
+      // Save the updated user document
+      await user.save();
+  
+      return res.status(200).json({ message: `Clock-in successful. Status: ${status}` });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
+  
 
 module.exports.clockOut = async (req, res) => {
     const { id } = req.user;
@@ -316,7 +332,6 @@ module.exports.clockOut = async (req, res) => {
     
         // Check if the user is currently clocked in
         const user = await User.findById(userId);
-        console.log(user)
         if (!user.isClockedIn) {
           return res.status(400).json({ error: 'User is not currently clocked in.' });
         }
