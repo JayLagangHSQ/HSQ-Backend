@@ -104,15 +104,10 @@ const userSchema = new mongoose.Schema({
     },
     timeSheet:[
         {
-            date:Number,
-            clockIn:{
-                hour:Number,
-                minute: Number
-            },
-            clockOut:{
-                hour:Number,
-                minute: Number
-            }
+            date:Date,
+            status:String,//either 
+            clockIn:Date,
+            clockOut:Date
         }
     ],
     password: {

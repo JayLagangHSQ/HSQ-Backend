@@ -13,6 +13,8 @@ router.put("/user/update/mobileNo", verify, userController.updateMobileNo)
 router.put("/user/update/personalEmail", verify, userController.updatePersonalEmail)
 router.put("/user/passwordUpdate", verify, userController.updatePassword);
 router.post('/user/clockIn', verify, userController.clockIn);
+router.put('/user/clockOut', verify, userController.clockOut);
+router.get('/user/timesheet', verify, userController.retrieveTimeSheet)
 router.post('/search', verify, userController.retrieveUserByNameAndDepartment)
 router.put('/user/acknowledgeUpdate', verify, userController.acknowledgeUpdate)
 module.exports = router;
