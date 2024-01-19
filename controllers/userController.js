@@ -302,6 +302,12 @@ module.exports.clockIn = async (req, res) => {
   
       // Update the user's timeSheet with the clock-in timestamp and set status based on lateness
       const clockInTime = new Date(ukTimeNow);
+
+      // Check if the user is attempting to log in beyond work hours
+      if (clockInTime.getHours() > workEnd) {
+        return res.status(400).json({ error: 'Cannot clock in beyond work hours.' });
+      }
+
       const status = clockInTime > new Date(ukTimeNow).setHours(workStart) ? 'late' : 'pending';
   
       user.timeSheet.unshift({
