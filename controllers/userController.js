@@ -277,14 +277,14 @@ module.exports.clockIn = async (req, res) => {
       }
 
       // Calculate scheduled start time allowing 30 minutes prior
-      const scheduledStartTime = new Date(ukTimeNow);
-      scheduledStartTime.setHours(user.scheduledWorkHour.workHours.start);
-      scheduledStartTime.setMinutes(user.scheduledWorkHour.workMinute.minute);
+      // const scheduledStartTime = new Date(ukTimeNow);
+      // scheduledStartTime.setHours(user.scheduledWorkHour.workHours.start);
+      // scheduledStartTime.setMinutes(user.scheduledWorkHour.workMinute.minute);
 
       // Check if it's outside the allowable clock-in window
-      if (currentDate < scheduledStartTime) {
-        return res.status(400).json({ error: 'Cannot clock in before 30 minutes prior to work hours.' });
-      }
+      // if (currentDate < scheduledStartTime) {
+      //   return res.status(400).json({ error: 'Cannot clock in before 30 minutes prior to work hours.' });
+      // }
 
       // Check if the user is already clocked in on the current date
       const alreadyClockedIn = user.timeSheet.some((entry) => {
@@ -302,13 +302,20 @@ module.exports.clockIn = async (req, res) => {
   
       // Update the user's timeSheet with the clock-in timestamp and set status based on lateness
       const clockInTime = new Date(ukTimeNow);
+      
+      //Calculate remaining hours before workstart.
+      const remainingHourBeforeStart = clockInTime.getHours() - (workStart-1);
 
+      if(remainingHourBeforeStart < 0){
+        return res.status(400).json({ error: 'Cannot clock-in more than 1 hour prior to start of work hour.' });
+      }
+      
       // Check if the user is attempting to log in beyond work hours
       if (clockInTime.getHours() > workEnd) {
         return res.status(400).json({ error: 'Cannot clock in beyond work hours.' });
       }
 
-      const status = clockInTime > new Date(ukTimeNow).setHours(workStart) ? 'late' : 'pending';
+      const status = clockInTime >= new Date(ukTimeNow).setHours(workStart) ? 'late' : 'pending';
   
       user.timeSheet.unshift({
         date: clockInTime,
@@ -320,7 +327,7 @@ module.exports.clockIn = async (req, res) => {
       user.isClockedIn = true;
   
       // Save the updated user document
-      await user.save();
+      // await user.save();
   
       return res.status(200).json({ message: `Clock-in successful. Status: ${status}` });
     } catch (error) {
