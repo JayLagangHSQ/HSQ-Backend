@@ -383,50 +383,53 @@ module.exports.clockOut = async (req, res) => {
 module.exports.retrieveTimeSheet = async(req,res) =>{
     const { id } = req.user;
 
-    try {
-      // Assuming you have some form of authentication and you can get the user ID from the request
-      const userId = id; // assuming userId is part of the route parameters
-  
-      // Find the user by ID
-      const user = await User.findById(userId);
-  
-      if (!user) {
-        return res.status(404).json({ error: 'User not found.' });
-      }
-  
-      // Retrieve the user's timeSheet based on the given month and year
-      const { month, year } = req.body;
-      let timeSheet;
-  
-      if (month && year) {
-        // If month and year are provided, filter timeSheet for the given month and year
-        timeSheet = user.timeSheet.filter(entry => {
-          const entryMonth = entry.date.getMonth() + 1; // Months are 0-indexed
-          const entryYear = entry.date.getFullYear();
-          return entryMonth === month && entryYear === year;
-        });
-      } else {
-        // If either month or year is not provided, default to the latest month available
-        const latestMonth = user.timeSheet.reduce((latest, entry) => {
-          const entryMonth = entry.date.getMonth() + 1; // Months are 0-indexed
-          const entryYear = entry.date.getFullYear();
-  
-          // Compare the year first, then the month
-          if (entryYear > latest.year || (entryYear === latest.year && entryMonth > latest.month)) {
-            return { year: entryYear, month: entryMonth, entries: [entry] };
-          } else if (entryYear === latest.year && entryMonth === latest.month) {
-            latest.entries.push(entry);
-          }
-  
-          return latest;
-        }, { year: 0, month: 0, entries: [] });
-  
-        timeSheet = latestMonth.entries;
-      }
-  
-      return res.status(200).json({ timeSheet });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Internal Server Error' });
+  try {
+    // Assuming you have some form of authentication and you can get the user ID from the request
+    const userId = id; // assuming userId is part of the route parameters
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
     }
+
+    // Retrieve the user's timeSheet based on the given month, year, and 'all' flag
+    const { month, year, all } = req.body;
+    let timeSheet;
+
+    if (all) {
+      // If 'all' is true, return all timeSheet data
+      timeSheet = user.timeSheet;
+    } else if (month && year) {
+      // If month and year are provided, filter timeSheet for the given month and year
+      timeSheet = user.timeSheet.filter(entry => {
+        const entryMonth = entry.date.getMonth() + 1; // Months are 0-indexed
+        const entryYear = entry.date.getFullYear();
+        return entryMonth === month && entryYear === year;
+      });
+    } else {
+      // If either month or year is not provided, default to the latest month available
+      const latestMonth = user.timeSheet.reduce((latest, entry) => {
+        const entryMonth = entry.date.getMonth() + 1; // Months are 0-indexed
+        const entryYear = entry.date.getFullYear();
+
+        // Compare the year first, then the month
+        if (entryYear > latest.year || (entryYear === latest.year && entryMonth > latest.month)) {
+          return { year: entryYear, month: entryMonth, entries: [entry] };
+        } else if (entryYear === latest.year && entryMonth === latest.month) {
+          latest.entries.push(entry);
+        }
+
+        return latest;
+      }, { year: 0, month: 0, entries: [] });
+
+      timeSheet = latestMonth.entries;
+    }
+
+    return res.status(200).json({ timeSheet });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 }
