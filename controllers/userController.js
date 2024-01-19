@@ -327,7 +327,7 @@ module.exports.clockIn = async (req, res) => {
       user.isClockedIn = true;
   
       // Save the updated user document
-      // await user.save();
+      await user.save();
   
       return res.status(200).json({ message: `Clock-in successful. Status: ${status}` });
     } catch (error) {
