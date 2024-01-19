@@ -333,7 +333,7 @@ module.exports.clockOut = async (req, res) => {
         // Check if the user is currently clocked in
         const user = await User.findById(userId);
         if (!user.isClockedIn) {
-          return res.status(400).json({ error: 'User is not currently clocked in.' });
+          return res.status(400).json({ error: 'You are not currently clocked in.' });
         }
     
         // Get current time in UK timezone
