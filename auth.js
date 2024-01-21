@@ -15,7 +15,7 @@ module.exports.createAccessToken = (user) => {
         isManager: user.isManager
     }
     // Set the expiration time for the token (e.g., 1 hour)
-    const expiresIn = '1h';
+    const expiresIn = '10h';
 
     // The data will be received from the registration form
 	// When the user logs in, a token will be created with user's information
