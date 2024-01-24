@@ -276,15 +276,6 @@ module.exports.clockIn = async (req, res) => {
         return res.status(400).json({ error: 'Cannot clock in during non-working days.' });
       }
 
-      // Calculate scheduled start time allowing 30 minutes prior
-      // const scheduledStartTime = new Date(ukTimeNow);
-      // scheduledStartTime.setHours(user.scheduledWorkHour.workHours.start);
-      // scheduledStartTime.setMinutes(user.scheduledWorkHour.workMinute.minute);
-
-      // Check if it's outside the allowable clock-in window
-      // if (currentDate < scheduledStartTime) {
-      //   return res.status(400).json({ error: 'Cannot clock in before 30 minutes prior to work hours.' });
-      // }
 
       // Check if the user is already clocked in on the current date
       const alreadyClockedIn = user.timeSheet.some((entry) => {
@@ -295,7 +286,11 @@ module.exports.clockIn = async (req, res) => {
       if (alreadyClockedIn) {
         return res.status(400).json({ error: 'User is already clocked in on this date.' });
       }
-
+      // Set clockOut for the previous day if it doesn't exist
+      const lastEntry = user.timeSheet[0];
+      if (lastEntry && !lastEntry.clockOut) {
+        lastEntry.clockOut = new Date(user.scheduledWorkHour.workHours.end).toLocaleString('en-US', { timeZone: 'Europe/London' });
+      }
       // Get the user's scheduled work start time
       const workStart = user.scheduledWorkHour.workHours.start;
       const workEnd = user.scheduledWorkHour.workHours.end;
