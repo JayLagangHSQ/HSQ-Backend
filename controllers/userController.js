@@ -288,8 +288,12 @@ module.exports.clockIn = async (req, res) => {
       }
       // Set clockOut for the previous day if it doesn't exist
       const lastEntry = user.timeSheet[0];
-      if (lastEntry && !lastEntry.clockOut) {
+      if (lastEntry.clockOut == null || lastEntry.clockOut == undefined) {
         lastEntry.clockOut = new Date(user.scheduledWorkHour.workHours.end).toLocaleString('en-US', { timeZone: 'Europe/London' });
+        if(lastEntry.status === "pending"){
+          lastEntry.status = "good"
+          lastEntry.clockOut = new Date(user.scheduledWorkHour.workHours.end).toLocaleString('en-US', { timeZone: 'Europe/London' });
+        }
       }
       // Get the user's scheduled work start time
       const workStart = user.scheduledWorkHour.workHours.start;
@@ -315,7 +319,7 @@ module.exports.clockIn = async (req, res) => {
       user.timeSheet.unshift({
         date: clockInTime,
         status: status,
-        clockIn: clockInTime,
+        clockIn: clockInTime
       });
   
       // Set isClockedIn to true
