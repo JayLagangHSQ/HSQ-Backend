@@ -269,7 +269,6 @@ module.exports.clockIn = async (req, res) => {
       // Get current time in UK timezone
       const ukTimeNow = new Date().toLocaleString('en-US', { timeZone: 'Europe/London' });
       const currentDate = new Date(ukTimeNow);
-
       // Check if it's a weekend
       if (currentDate.getDay() === user.scheduledWorkHour.workDays.offOne || currentDate.getDay() === user.scheduledWorkHour.workDays.offTwo) {
  
@@ -301,7 +300,6 @@ module.exports.clockIn = async (req, res) => {
   
       // Update the user's timeSheet with the clock-in timestamp and set status based on lateness
       const clockInTime = new Date(ukTimeNow);
-      
       //Calculate remaining hours before workstart.
       const remainingHourBeforeStart = clockInTime.getHours() - (workStart-1);
 
@@ -317,9 +315,9 @@ module.exports.clockIn = async (req, res) => {
       const status = clockInTime >= new Date(ukTimeNow).setHours(workStart) ? 'late' : 'pending';
   
       user.timeSheet.unshift({
-        date: clockInTime,
+        date: currentDate,
         status: status,
-        clockIn: clockInTime
+        clockIn: ukTimeNow
       });
   
       // Set isClockedIn to true
@@ -363,7 +361,7 @@ module.exports.clockOut = async (req, res) => {
     
         // Update the latest clock-in entry with the clock-out timestamp
         const clockOutTime = new Date(ukTimeNow);
-        latestClockInEntry.clockOut = clockOutTime;
+        latestClockInEntry.clockOut = ukTimeNow;
     
         // Check the current status and update it accordingly
         if (latestClockInEntry.status === 'pending') {
