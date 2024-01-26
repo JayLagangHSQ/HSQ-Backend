@@ -12,7 +12,8 @@ module.exports.createAccessToken = (user) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        isManager: user.isManager
+        isManager: user.isManager,
+        department: user.department
     }
     // Set the expiration time for the token (e.g., 1 hour)
     const expiresIn = '10h';
@@ -52,4 +53,17 @@ module.exports.verifyManager = (req, res, next) => {
       return res.status(403).send({error : "forbidden access"})
     
     }
-  }
+}
+
+module.exports.verifyHR = (req, res, next) => {
+
+    if(req.user.department === 'hr'){
+     
+      next();
+    
+    } else {
+
+      return res.status(403).send({error : "forbidden access"})
+    
+    }
+}
