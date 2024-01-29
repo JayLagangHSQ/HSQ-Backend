@@ -44,6 +44,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'address is required']
     },
+    employmentDate: {
+        type: Date,
+        required: [true, 'employmentDate is required']
+    },
     isActive: {
         type: Boolean,
         default: true
