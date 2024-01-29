@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'lastName is required']
     },
-    idNumber:{
+    companyId:{
         type: String,
         default: 'Edit my ID Number'
     },
