@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
         required: [true, 'lastName is required']
     },
     companyId:{
-        type: String,
+        type: Number,
         default: 'Edit my ID Number'
     },
     profilePictureKey:{},
@@ -35,7 +35,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'email is required']
     },
-    personalEmail:String,
+    personalEmail:{
+        type: String,
+        required: [true, 'personalEmail is required']
+    },
     mobileNo: {
         type: String,
         required: [true, 'mobileNo is required']

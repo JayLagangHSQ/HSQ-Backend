@@ -6,6 +6,7 @@ const isWorkingTime = require('../util/workScheduleValidator')
 const image = require('../image');
 const {retrieveProfileImageUrl} = image;
 
+
 module.exports.loginUser = async (req, res) => {
     try {
         return await User.findOne({ email: req.body.email }).then(result => {
@@ -31,12 +32,16 @@ module.exports.registerUser = async (req, res) => {
     let newUser = new User({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
+        companyId: req.generatedCompanyId,
+        department: req.body.department,
         jobTitle: req.body.jobTitle,
         email: req.body.email,
+        personalEmail: req.body.personalEmail,
         mobileNo: req.body.mobileNo,
         address:req.body.address,
+        employmentDate: req.body.employmentDate,
         // 10 is the value provided as the number of "salt" rounds that the bcrypt algorithm will run in order to encrypt the password
-        password: bcrypt.hashSync(req.body.password, 10)
+        password: bcrypt.hashSync('default', 10)
     });
 
     try {

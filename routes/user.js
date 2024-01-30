@@ -1,12 +1,15 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const auth = require('../auth')
-const {verify, verifyManager}  = auth;
+const {verify, verifyManager, verifyHR}  = auth;
 const image =require('../image');
 const {uploadProfileImage, deleteProfileImage} = image;
+
+const {companyIdGenerator} = require('../middlewares/middlewares')
+
 const router = express.Router();
 router.post("/login",  userController.loginUser);
-router.post("/register",  userController.registerUser);
+router.post("/register", verify,verifyHR,companyIdGenerator, userController.registerUser);
 router.get("/user/detail", verify, userController.getUserDetail);
 router.put('/user/profilePicture/update', verify,uploadProfileImage, deleteProfileImage, userController.updateProfilePicture);
 router.put("/user/update/mobileNo", verify, userController.updateMobileNo)
