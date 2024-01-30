@@ -28,9 +28,9 @@ module.exports.retrieveUsers = async (req,res) =>{
   }
 
 module.exports.retrieveUserByNameOrIdAndDepartment = async (req, res) => {
+
     try {
-        let { keyword, department,generateImageUrl } = req.body;
-        
+        let { keyword, department,generateImageUrl} = req.body;
         //set the default value for keyword and department if undefined in the req.body
         if(!keyword){
             keyword = ""
@@ -46,8 +46,9 @@ module.exports.retrieveUserByNameOrIdAndDepartment = async (req, res) => {
                 { lastName: { $regex: keyword, $options: 'i' } },
                 { companyId: { $regex: keyword, $options: 'i' } },
             ],
+            isActive: true
         };
-        
+
         // If department is not "default", add department filter to the query
         if (department !== 'default') {
             query.department = department;
