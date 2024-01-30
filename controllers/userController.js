@@ -288,10 +288,15 @@ module.exports.clockIn = async (req, res) => {
       // Set clockOut for the previous day if it doesn't exist
       const lastEntry = user.timeSheet[0];
       if (lastEntry.clockOut == null || lastEntry.clockOut == undefined) {
-        lastEntry.clockOut = new Date(user.scheduledWorkHour.workHours.end).toLocaleString('en-US', { timeZone: 'Europe/London' });
-        if(lastEntry.status === "pending"){
-          lastEntry.status = "good"
-          lastEntry.clockOut = new Date(user.scheduledWorkHour.workHours.end).toLocaleString('en-US', { timeZone: 'Europe/London' });
+        // Extract the date from clockIn
+        const clockInDate = new Date(lastEntry.clockIn);
+        // Set clockOut to the same date as clockIn with the end work hours from user.scheduledWorkHour.workHours
+        const clockOutDate = new Date(clockInDate);
+        clockOutDate.setHours(user.scheduledWorkHour.workHours.end, 0, 0, 0);
+        lastEntry.clockOut = clockOutDate
+
+        if (lastEntry.status === "pending") {
+          lastEntry.status = "good";
         }
       }
       // Get the user's scheduled work start time
