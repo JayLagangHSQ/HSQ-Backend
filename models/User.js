@@ -81,17 +81,19 @@ const userSchema = new mongoose.Schema({
         ]
     },
     scheduledWorkHour:{
+        //  ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
         workDays:{
             offOne:{
                 type: Number,
-                default: 1
+                default: 0
             },
             offTwo:{
                 type: Number,
-                default: 5
+                default: 6
             }
         },
         workHours:{
+        // UK time (24 hours)
             start:{
                 type: Number,
                 default: 9
