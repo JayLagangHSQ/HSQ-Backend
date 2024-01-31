@@ -6,5 +6,6 @@ const image =require('../image');
 const router = express.Router();
 
 router.post('/search',verify,verifyHR, hrController.retrieveUserByNameOrIdAndDepartment)
+router.put('/:userId/update',verify,verifyHR , hrController.updateUserInfo)
 
 module.exports = router;

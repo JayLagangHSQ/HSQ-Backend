@@ -33,6 +33,10 @@ module.exports.registerUser = async (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         companyId: req.generatedCompanyId,
+        profilePictureKey:{
+          key: null
+        },
+        profilePictureUrl:"",
         department: req.body.department,
         jobTitle: req.body.jobTitle,
         email: req.body.email,
@@ -290,18 +294,20 @@ module.exports.clockIn = async (req, res) => {
       if (alreadyClockedIn) {
         return res.status(400).json({ error: 'User is already clocked in on this date.' });
       }
-      // Set clockOut for the previous day if it doesn't exist
-      const lastEntry = user.timeSheet[0];
-      if (lastEntry.clockOut == null || lastEntry.clockOut == undefined) {
-        // Extract the date from clockIn
-        const clockInDate = new Date(lastEntry.clockIn);
-        // Set clockOut to the same date as clockIn with the end work hours from user.scheduledWorkHour.workHours
-        const clockOutDate = new Date(clockInDate);
-        clockOutDate.setHours(user.scheduledWorkHour.workHours.end, 0, 0, 0);
-        lastEntry.clockOut = clockOutDate
+      // Set clockOut for the previous day if it doesn't exist but check first if there is an existing entry in the timesheets.
+      if(user.timeSheet.length > 0){
+        const lastEntry = user.timeSheet[0];
+        if (lastEntry.clockOut == null || lastEntry.clockOut == undefined) {
+          // Extract the date from clockIn
+          const clockInDate = new Date(lastEntry.clockIn);
+          // Set clockOut to the same date as clockIn with the end work hours from user.scheduledWorkHour.workHours
+          const clockOutDate = new Date(clockInDate);
+          clockOutDate.setHours(user.scheduledWorkHour.workHours.end, 0, 0, 0);
+          lastEntry.clockOut = clockOutDate
 
-        if (lastEntry.status === "pending") {
-          lastEntry.status = "good";
+          if (lastEntry.status === "pending") {
+            lastEntry.status = "good";
+          }
         }
       }
       // Get the user's scheduled work start time

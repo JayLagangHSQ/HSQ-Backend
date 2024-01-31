@@ -10,8 +10,7 @@ const userSchema = new mongoose.Schema({
         required: [true, 'lastName is required']
     },
     companyId:{
-        type: Number,
-        default: 'Edit my ID Number'
+        type: Number
     },
     profilePictureKey:{},
     profilePictureUrl:String,

@@ -92,3 +92,47 @@ module.exports.retrieveUserByNameOrIdAndDepartment = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+// Update user information
+module.exports.updateUserInfo = async (req, res) => {
+    const userId = req.params.userId;
+    const updates = req.body;
+  
+    try {
+      // Ensure that the user exists
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // Update the allowed fields
+      const allowedFields = ['firstName', 'lastName', 'department', 'jobTitle', 'email', 'personalEmail', 'address', 'mobileNo', 'scheduledWorkHour'];
+      allowedFields.forEach(field => {
+        if (updates[field] !== undefined) {
+          user[field] = updates[field];
+        }
+      });
+      console.log(updates)
+
+      // Create a new object with only the desired fields
+      const updatedUser = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        department: user.department,
+        jobTitle: user.jobTitle,
+        email: user.email,
+        personalEmail: user.personalEmail,
+        address: user.address,
+        mobileNo: user.mobileNo,
+        scheduledWorkHour: user.scheduledWorkHour,
+    };
+
+      // Save the updated user
+    //   await user.save();
+  
+      res.status(200).json({ message: 'User updated successfully', user: updatedUser });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
