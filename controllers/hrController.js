@@ -112,7 +112,7 @@ module.exports.updateUserInfo = async (req, res) => {
           user[field] = updates[field];
         }
       });
-      console.log(updates)
+
 
       // Create a new object with only the desired fields
       const updatedUser = {
@@ -128,7 +128,7 @@ module.exports.updateUserInfo = async (req, res) => {
     };
 
       // Save the updated user
-    //   await user.save();
+      await user.save();
   
       res.status(200).json({ message: 'User updated successfully', user: updatedUser });
     } catch (error) {
