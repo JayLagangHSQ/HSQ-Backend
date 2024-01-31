@@ -118,6 +118,20 @@ const userSchema = new mongoose.Schema({
             clockOut:Date
         }
     ],
+    profileEditHistory:[
+        {
+            editor:{
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User'
+            },
+            editDate:{
+                type: Date
+            },
+            changes:{
+                type: Object
+            }
+        }
+    ],
     password: {
         type: String,
         require: [true, 'password is required']

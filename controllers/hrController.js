@@ -97,7 +97,6 @@ module.exports.retrieveUserByNameOrIdAndDepartment = async (req, res) => {
 module.exports.updateUserInfo = async (req, res) => {
     const userId = req.params.userId;
     const updates = req.body;
-  
     try {
       // Ensure that the user exists
       const user = await User.findById(userId);
@@ -126,6 +125,16 @@ module.exports.updateUserInfo = async (req, res) => {
         mobileNo: user.mobileNo,
         scheduledWorkHour: user.scheduledWorkHour,
     };
+        //below is for the editHistory
+        const now = new Date();
+        const ukTimezoneOffset = 0; // Replace with the actual offset if necessary
+        const ukTime = new Date(now.getTime() + (ukTimezoneOffset * 60 * 1000));
+        // Unshift a new object to profileEditHistory
+        user.profileEditHistory.unshift({
+            editor: req.user.id, // Assuming req.id contains the editor's ID
+            editDate: ukTime, // This will be the current date and time
+            changes: updatedUser
+        });
 
       // Save the updated user
       await user.save();
