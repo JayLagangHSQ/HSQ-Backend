@@ -14,7 +14,11 @@ const questionnaireSchema = new mongoose.Schema({
     title: String,
     description: String,
     fields:[
-    ]
+    ],
+    lastSavedTime:{
+        type:Date,
+        default: new Date()
+    }
 })
 
 module.exports = mongoose.model('Questionnaire', questionnaireSchema);
