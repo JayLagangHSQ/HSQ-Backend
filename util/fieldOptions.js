@@ -1,0 +1,53 @@
+const levelsOption = [2,3,4,5,6,7,8,9,0]
+
+const fieldOptions = [
+    {
+        fieldType: "multipleChoice",
+        isMultipleAnswers: false,
+        isRequired: true,
+        isOtherOption: false,
+        otherOption: null,
+        question: "Question",
+        answerOptions:[
+            {
+                name: 'option 1',
+                isSelected: false
+            },
+            {
+                name: 'option 1',
+                isSelected: false
+            }
+        ]
+    },
+    {
+        fieldType: "text",
+        isLongAnswer: false,
+        isRequired: true,
+        question: "Question",
+        answer: null
+    },
+    {
+        fieldType: "rating",
+        isRequired: true,
+        question: "Question",
+        levels: levelsOption[3],
+        symbol: ['star', 'number']
+    },
+    {
+        fieldType: "date",
+        isRequired: true,
+        question: "Question",
+        selectedDate: null
+    },
+    {
+        fieldType: "ranking",
+        isRequired: true,
+        question: "Question",
+        candidates: [
+            'option 1',
+            'option 2'
+        ]
+    }
+]
+
+module.exports= fieldOptions;
