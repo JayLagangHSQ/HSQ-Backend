@@ -14,11 +14,27 @@ const questionnaireSchema = new mongoose.Schema({
     title: String,
     description: String,
     fields:[
+        {
+            fieldType:String,
+            isMultipleAnswers:Boolean,
+            isRequired: Boolean,
+            isOtherOption:Boolean,
+            question: String,
+            answerOptions:Array,
+            isLongAnswer:Boolean,
+            textTypeAnswer: String,
+            ratingTypeAnswer: Number,
+            levels:Number,
+            symbol:String,
+            selectedDate: Date,
+            candidates: Array
+        }
     ],
     lastSavedTime:{
         type:Date,
         default: new Date()
-    }
+    },
+    responses: Array
 })
 
 module.exports = mongoose.model('Questionnaire', questionnaireSchema);
