@@ -1,6 +1,10 @@
 const levelsOption = [2,3,4,5,6,7,8,9,0]
+const symbolOption = ['star', 'number']
+const defaultLevel = levelsOption[3]
+const defaultSymbol = symbolOption[0]
 
 const fieldOptions = [
+
     {
         fieldType: "multipleChoice",
         isMultipleAnswers: false,
@@ -14,7 +18,7 @@ const fieldOptions = [
                 isSelected: false
             },
             {
-                name: 'option 1',
+                name: 'option 2',
                 isSelected: false
             }
         ]
@@ -24,14 +28,15 @@ const fieldOptions = [
         isLongAnswer: false,
         isRequired: true,
         question: "Question",
-        answer: null
+        textTypeAnswer: null
     },
     {
         fieldType: "rating",
         isRequired: true,
         question: "Question",
-        levels: levelsOption[3],
-        symbol: ['star', 'number']
+        levels: defaultLevel,
+        symbol: defaultSymbol,
+        ratingTypeAnswer: null
     },
     {
         fieldType: "date",
@@ -50,4 +55,4 @@ const fieldOptions = [
     }
 ]
 
-module.exports= fieldOptions;
+module.exports = fieldOptions;
