@@ -13,6 +13,7 @@ module.exports.createAccessToken = (user) => {
         lastName: user.lastName,
         email: user.email,
         isManager: user.isManager,
+        isExecutive: user.isExecutive,
         department: user.department
     }
     // Set the expiration time for the token (e.g., 1 hour)
