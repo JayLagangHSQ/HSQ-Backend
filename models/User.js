@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isExecutive:{
+        type: Boolean,
+        default: false
+    },
     isEditor:{
         type: Boolean,
         default:false
