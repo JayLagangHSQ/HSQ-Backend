@@ -11,6 +11,7 @@ const newsAndUpdate = require("./routes/newsAndUpdate")
 const mail = require("./routes/mail")
 const hr = require("./routes/hr")
 const formBuilder = require("./routes/formBuilder")
+const shoutout = require("./routes/shoutout");
 // const {instantaneous} = require('./util/instantaneous')
 const app = express();
 const port = 4005;
@@ -47,6 +48,7 @@ app.use('/api/newsAndUpdates', newsAndUpdate)
 app.use('/api/mails', mail);
 app.use('/api/hr/users', hr);
 app.use('/api/formBuilder', formBuilder);
+app.use('/api/shoutouts', shoutout);
 //socket.io middleware for real-time features
 // instantaneous();
 
