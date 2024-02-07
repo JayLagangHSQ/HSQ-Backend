@@ -4,6 +4,7 @@ const multer = require('multer');
 const dotenv = require('dotenv').config().parsed;
 const crypto = require('crypto');
 const sharp = require('sharp');
+const User = require('./models/User')
 
 const s3Client = new S3Client({
 	region: dotenv.BUCKET_REGION, // Replace with your AWS region
@@ -67,7 +68,7 @@ module.exports.uploadProfileImage = async (req, res, next) => {
             await s3Client.send(putObjectCommand);
 
             // Attach the Key to the req object
-            req.key = params.Key;
+            req.objectKey = params.Key;
 
             next();
         });
@@ -76,8 +77,11 @@ module.exports.uploadProfileImage = async (req, res, next) => {
     }
 };
 module.exports.deleteProfileImage = async (req, res, next) => {
+
+	const user = await User.findById(req.user.id)
     try {
-        const key  = req.key; // Assuming the image key is passed in the request body
+
+        const key  = user.profilePictureKey.key; // Assuming the image key is passed in the request body
 		if(key == null || key == undefined || key == ''){
 			return next();
 		}
