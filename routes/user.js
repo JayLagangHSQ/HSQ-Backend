@@ -11,6 +11,7 @@ const router = express.Router();
 router.post("/login",  userController.loginUser);
 router.post("/register", verify,verifyHR,companyIdGenerator, userController.registerUser);
 router.get("/user/detail", verify, userController.getUserDetail);
+router.get("/myDashboard", verify, userController.retrieveMyDashboard);
 router.put('/user/profilePicture/update', verify,uploadProfileImage, deleteProfileImage, userController.updateProfilePicture);
 router.put("/user/update/mobileNo", verify, userController.updateMobileNo)
 router.put("/user/update/personalEmail", verify, userController.updatePersonalEmail)

@@ -76,6 +76,12 @@ const userSchema = new mongoose.Schema({
             }
         ]
     },
+    myTeam:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ],
     managerResource:{
         humanResource:[
             {

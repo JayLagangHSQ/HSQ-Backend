@@ -88,6 +88,57 @@ module.exports.getUserDetail = async (req, res) => {
         return res.status(500).send({ error: "Server Error" });
     }
 };
+
+module.exports.retrieveMyDashboard = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate('myTeam', 'firstName lastName department jobTitle profilePictureKey');
+    if (!user) {
+      return res.status(404).send({ error: "User not found" });
+    }
+
+    user.password = "";
+    user.department = user.department.toLocaleUpperCase();
+
+    // Retrieve signed URL for parent object's profile picture
+    const parentProfilePictureUrl = await retrieveProfileImageUrl(user.profilePictureKey.key);
+
+    // Map over each item in myTeam array to retrieve signed URL for profile picture and include ObjectId
+    const myTeamDetailsPromises = user.myTeam.map(async (teamMember) => {
+      const signedUrl = await retrieveProfileImageUrl(teamMember.profilePictureKey.key);
+      return {
+        _id: teamMember._id,
+        firstName: teamMember.firstName,
+        lastName: teamMember.lastName,
+        department: teamMember.department,
+        jobTitle: teamMember.jobTitle,
+        profilePictureUrl: signedUrl
+      };
+    });
+
+    // Wait for all promises to resolve
+    const myTeamDetails = await Promise.all(myTeamDetailsPromises);
+
+    // Construct the response object including user, parent profile picture URL, and myTeam details
+    const response = {
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        department: user.department,
+        jobTitle: user.jobTitle,
+        profilePictureUrl: parentProfilePictureUrl,
+        // Include any other user details needed
+      },
+      myTeam: myTeamDetails
+    };
+
+    return res.status(200).send({ response });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ error: "Server Error" });
+  }
+};
+
 module.exports.retrieveUserByNameAndDepartment = async(req, res) =>{
     try {
         // Extract name and department from the request body
