@@ -97,7 +97,7 @@ module.exports.retrieveMyDashboard = async (req, res) => {
     }
 
     user.password = "";
-    user.department = user.department.toLocaleUpperCase();
+    user.department = user.department;
 
     // Retrieve signed URL for parent object's profile picture
     const parentProfilePictureUrl = await retrieveProfileImageUrl(user.profilePictureKey.key);
