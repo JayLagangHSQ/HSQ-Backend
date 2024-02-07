@@ -29,26 +29,31 @@ module.exports.loginUser = async (req, res) => {
 }
 
 module.exports.registerUser = async (req, res) => {
-    let newUser = new User({
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        companyId: req.generatedCompanyId,
-        profilePictureKey:{
-          key: null
-        },
-        profilePictureUrl:"",
-        department: req.body.department,
-        jobTitle: req.body.jobTitle,
-        email: req.body.email,
-        personalEmail: req.body.personalEmail,
-        mobileNo: req.body.mobileNo,
-        address:req.body.address,
-        employmentDate: req.body.employmentDate,
-        // 10 is the value provided as the number of "salt" rounds that the bcrypt algorithm will run in order to encrypt the password
-        password: bcrypt.hashSync('default', 10)
-    });
 
     try {
+        // Check if the role is provided and valid
+        const validRoles = ["executive", "individual contributor", "manager"];
+        if (!req.body.role || !validRoles.includes(req.body.role.toLowerCase())) {
+            return res.status(400).send({ error: "Invalid role provided. Must be one of: " + validRoles.join(', ') });
+        }
+
+        let newUser = new User({
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          companyId: req.generatedCompanyId,
+          profilePictureUrl:"",
+          department: req.body.department,
+          role: req.body.role,
+          jobTitle: req.body.jobTitle,
+          email: req.body.email,
+          personalEmail: req.body.personalEmail,
+          mobileNo: req.body.mobileNo,
+          address:req.body.address,
+          employmentDate: req.body.employmentDate,
+          // 10 is the value provided as the number of "salt" rounds that the bcrypt algorithm will run in order to encrypt the password
+          password: bcrypt.hashSync('default', 10)
+        });
+
         const isEmailTaken = await User.findOne({ email: req.body.email }).then(result => {
             if (result == null) {
                 return false;
@@ -66,7 +71,7 @@ module.exports.registerUser = async (req, res) => {
         }
 
     } catch (err) {
-        res.status(500).send({ error: "Server Error" });
+        res.status(500).send({ error: err.message });
     }
 }
 
@@ -90,48 +95,39 @@ module.exports.getUserDetail = async (req, res) => {
 };
 
 module.exports.retrieveMyDashboard = async (req, res) => {
+  
+  const userId = req.user.id;
+  const {department} = req.user;
+  
   try {
-    const user = await User.findById(req.user.id).populate('myTeam', 'firstName lastName department jobTitle profilePictureKey');
+
+    const user = await User.findById(userId).select('_id firstName lastName department jobTitle profilePictureKey');
     if (!user) {
       return res.status(404).send({ error: "User not found" });
     }
+    console.log(user)
+    const userSignedUrl = await retrieveProfileImageUrl(user.profilePictureKey.key)
+    user.profilePictureUrl = userSignedUrl
 
-    user.password = "";
-    user.department = user.department;
+    const myTeam = await User.find({ department: { $regex: new RegExp(department, 'i') } }).select('_id firstName lastName department jobTitle profilePictureKey');
 
-    // Retrieve signed URL for parent object's profile picture
-    const parentProfilePictureUrl = await retrieveProfileImageUrl(user.profilePictureKey.key);
 
-    // Map over each item in myTeam array to retrieve signed URL for profile picture and include ObjectId
-    const myTeamDetailsPromises = user.myTeam.map(async (teamMember) => {
-      const signedUrl = await retrieveProfileImageUrl(teamMember.profilePictureKey.key);
-      return {
-        _id: teamMember._id,
-        firstName: teamMember.firstName,
-        lastName: teamMember.lastName,
-        department: teamMember.department,
-        jobTitle: teamMember.jobTitle,
-        profilePictureUrl: signedUrl
-      };
-    });
+    // Retrieve profile picture URL for each user in myTeam
+    for (let i = 0; i < myTeam.length; i++) {
+      const userProfilePictureUrl = await retrieveProfileImageUrl(myTeam[i].profilePictureKey.key);
+      myTeam[i].profilePictureUrl = userProfilePictureUrl;
+    }
+    // Find index of user in myTeam and splice it
+    const indexToRemove = myTeam.findIndex(member => member._id.toString() === userId);
+    if (indexToRemove !== -1) {
+      myTeam.splice(indexToRemove, 1);
+    }
 
-    // Wait for all promises to resolve
-    const myTeamDetails = await Promise.all(myTeamDetailsPromises);
-
-    // Construct the response object including user, parent profile picture URL, and myTeam details
-    const response = {
-      user: {
-        _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        department: user.department,
-        jobTitle: user.jobTitle,
-        profilePictureUrl: parentProfilePictureUrl,
-        // Include any other user details needed
-      },
-      myTeam: myTeamDetails
-    };
-
+    let response ={
+      user: user,
+      foundTeamates: myTeam
+    }
+    
     return res.status(200).send({ response });
   } catch (err) {
     console.error(err);

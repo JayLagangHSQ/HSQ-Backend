@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const validRoles = ["executive", "individual contributor", "manager"];
+
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
@@ -12,11 +14,22 @@ const userSchema = new mongoose.Schema({
     companyId:{
         type: Number
     },
-    profilePictureKey:{},
+    profilePictureKey:{
+        type: Object,
+        default: {key:"default-profile.png"}
+    },
     profilePictureUrl:String,
     department:{
         type:String,
         require: [true, 'department is required']
+    },
+    role:{
+        type: String,
+        required: [true, 'role is required'],
+        enum: {
+            values: validRoles,
+            message: 'Invalid role. Must be one of: ' + validRoles.join(', ')
+        }
     },
     jobTitle:{
         type:String,
@@ -76,12 +89,6 @@ const userSchema = new mongoose.Schema({
             }
         ]
     },
-    myTeam:[
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        }
-    ],
     managerResource:{
         humanResource:[
             {

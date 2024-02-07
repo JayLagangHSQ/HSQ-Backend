@@ -3,14 +3,31 @@ const User = require('../models/User')
 
 module.exports.createNewShoutout = async (req,res) =>{
     const user = req.user.id;
-    const {awardeeId, title, message } = req.body;
+    let {awardeeId, title, message } = req.body;
     try{
+
+        if(!title || (title === "")){
+            
+        }
         //check if awardee exist in the database
-        const awardee = User.findById(awardeeId)
-        
+        const awardee = await User.findById(awardeeId)
+        if(!awardee){
+            return res.status(404).json({error: 'Awardee not found'})
+        }
+        console.log(awardee)
+        const newShoutout = new Shoutout({
+            author: user,
+            awardee: awardeeId,
+            title: title,
+            message: message
+        })
+
+        await newShoutout.save();
+
+        return res.status(201).json({ shoutout: newShoutout });
 
     } catch(err){
-        res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
     
     
