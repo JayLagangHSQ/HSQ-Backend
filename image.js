@@ -3,6 +3,7 @@ const {getSignedUrl} = require("@aws-sdk/s3-request-presigner");
 const multer = require('multer');
 const dotenv = require('dotenv').config().parsed;
 const crypto = require('crypto');
+const sharp = require('sharp');
 
 const s3Client = new S3Client({
 	region: dotenv.BUCKET_REGION, // Replace with your AWS region
@@ -19,34 +20,60 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // HERE I JUST REALIZED THAT I'M NOT FOLLOWING THE DRY PRINCIPLE
+// Function to compress the image with dynamic quality adjustment
+const compressImage = async (imageBuffer, targetSize) => {
+    let quality = 100; // Starting quality
+    let compressedImageBuffer = imageBuffer;
+    let currentSize = compressedImageBuffer.length;
 
-// Handle the image upload - for single image only
+    // While the current size is larger than the target size, reduce the quality and compress again
+    while (currentSize > targetSize && quality > 0) {
+        // Adjust quality
+        quality -= 5; // You can adjust the step size as needed
+
+        // Compress the image with the adjusted quality
+        compressedImageBuffer = await sharp(imageBuffer)
+            .jpeg({ quality })
+            .toBuffer();
+
+        // Update the current size
+        currentSize = compressedImageBuffer.length;
+    }
+
+    return compressedImageBuffer;
+};
+
 module.exports.uploadProfileImage = async (req, res, next) => {
-	try {
-		// Assuming 'upload' is properly configured with multer for handling file uploads
-		upload.single('image')(req, res, async (err) => {
-			const { key } = req.body; // Assuming the image key is passed in the request body
-			req.key = key;
-			if (err) {
-				return res.status(500).send(false);
-			}
-			const params = {
-				Bucket: employeePictureBucket,
-				Key: randomImageNamer(), // Set a unique key for the file
-				Body: req.file.buffer
-			};
+    try {
+        // Assuming 'upload' is properly configured with multer for handling file uploads
+        upload.single('image')(req, res, async (err) => {
+            const { key } = req.body; // Assuming the image key is passed in the request body
+            req.key = key;
+            if (err) {
+                return res.status(500).send(false);
+            }
+            const params = {
+                Bucket: employeePictureBucket,
+                Key: randomImageNamer(), // Set a unique key for the file
+                Body: req.file.buffer
+            };
 
-			const putObjectCommand = new PutObjectCommand(params);
-			await s3Client.send(putObjectCommand);
+            // Compress the image using dynamic quality adjustment
+            const compressedImageBuffer = await compressImage(req.file.buffer, 500 * 1024); // 500kb in bytes
 
-			// Attach the Key to the req object
-			req.objectKey = params.Key;
+            params.Body = compressedImageBuffer; // Replace original buffer with compressed image buffer
 
-			next();
-		});
-	} catch (uploadErr) {
-		return res.status(500).send(false);
-	}
+            const putObjectCommand = new PutObjectCommand(params);
+            await s3Client.send(putObjectCommand);
+
+            // Attach the Key to the req object
+            req.key = params.Key;
+
+            next();
+        });
+    } catch (uploadErr) {
+        return res.status(500).send(false);
+    }
 };
 module.exports.deleteProfileImage = async (req, res, next) => {
     try {
