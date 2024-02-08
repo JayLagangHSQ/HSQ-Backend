@@ -14,6 +14,7 @@ module.exports.createAccessToken = (user) => {
         email: user.email,
         isManager: user.isManager,
         isExecutive: user.isExecutive,
+        role: user.role,
         department: user.department
     }
     // Set the expiration time for the token (e.g., 1 hour)
@@ -58,7 +59,7 @@ module.exports.verifyManager = (req, res, next) => {
 
 module.exports.verifyHR = (req, res, next) => {
 
-    if(req.user.department === 'hr'){
+    if(req.user.department === 'hr' || req.user.department === 'executives' ){
      
       next();
     
