@@ -1,4 +1,4 @@
-APIs FOR THE DASHBOARD PAGE
+                                                APIs FOR THE DASHBOARD PAGE
 
 endpoint 1: https://hsqserver-833x.onrender.com/api/users/myDashboard
 Usecase: Can be used to retrieve overview data for the Dashboard page.
