@@ -75,6 +75,25 @@ module.exports.registerUser = async (req, res) => {
     }
 }
 
+module.exports.retrieveMyDetails = async (req, res) =>{
+  const userId = req.user.id
+  try {
+    const myDetails = await User.findById(userId).select('_id firstName lastName department role jobTitle profilePictureKey');
+    if (myDetails) {
+
+        let signedUrl = await retrieveProfileImageUrl(myDetails.profilePictureKey.key)
+        myDetails.profilePictureUrl = signedUrl;
+        return res.status(200).send({ myDetails });
+
+    } else {
+        return res.status(404).send({ error: "User not found" });
+    }
+  } catch (err) {
+      console.error(err);
+      return res.status(500).send({ error: "Server Error" });
+  }
+}
+
 module.exports.getUserDetail = async (req, res) => {
     try {
         const result = await User.findById(req.user.id);
@@ -105,7 +124,7 @@ module.exports.retrieveMyDashboard = async (req, res) => {
     if (!user) {
       return res.status(404).send({ error: "User not found" });
     }
-    console.log(user)
+    
     const userSignedUrl = await retrieveProfileImageUrl(user.profilePictureKey.key)
     user.profilePictureUrl = userSignedUrl
 
@@ -134,6 +153,25 @@ module.exports.retrieveMyDashboard = async (req, res) => {
     return res.status(500).send({ error: "Server Error" });
   }
 };
+
+module.exports.retrieveTeammateInfo = async(req,res) =>{
+  const {teammateId} = req.params;
+  try{
+
+    const teammateData = await User.findById(teammateId).select('_id firstName lastName role department jobTitle email personalEmail mobileNo address employmentDate profilePictureKey');
+
+    const teammateSignedUrl = await retrieveProfileImageUrl(teammateData.profilePictureKey.key)
+    teammateData.profilePictureUrl = teammateSignedUrl
+
+    return res.status(200).send({ teammateData });
+
+  }catch(err){
+    
+    return res.status(500).send({ error: err.message});
+
+  }
+
+}
 
 module.exports.retrieveUserByNameAndDepartment = async(req, res) =>{
     try {

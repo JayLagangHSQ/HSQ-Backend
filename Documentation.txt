@@ -1,6 +1,37 @@
-                                                APIs FOR THE DASHBOARD PAGE
+API FOR RETRIEVING TOKEN
+ 
+Endpoint: https://hsqserver-833x.onrender.com/api/users/login,
+Usecase: this is the api to retrieve or secure an accesstoken/token.
+Method: POST,
+body:{
+         email: String,
+         password: String
+} 
+ 
+Below are the credentials that you may use. These are test accounts:
+ 
+email: manager@hollywoodsq.com
+password: default
+ 
+email: hardy@hollywoodsq.com
+password: default
 
-endpoint 1: https://hsqserver-833x.onrender.com/api/users/myDashboard
+==============================//
+
+API FOR RETRIEVING LOGGED-IN USERS DETAILS
+ 
+Endpoint: https://hsqserver-833x.onrender.com/api/users/myDetails,
+Usecase: this is used to retrieve logged-in user's details (user who have valid token). You may use the retrieved details as basis on what component to render to the user. For example: if response.user.department === executive then show/render the executives view, etc.
+Method: GET,
+headers:{
+       Authorization: 'Bearer ${token}'
+}
+
+==============================//
+ 
+APIs FOR THE DASHBOARD PAGE
+ 
+Endpoint 1: https://hsqserver-833x.onrender.com/api/users/myDashboard
 Usecase: Can be used to retrieve overview data for the Dashboard page.
 Method: GET,
 headers:{
@@ -8,8 +39,16 @@ headers:{
 }
 
 -------------------------------------------
-
-endpoint 2: https://hsqserver-833x.onrender.com/api/users/user/profilePicture/update
+ 
+Endpoint 2: https://hsqserver-833x.onrender.com/api/users/${teammate._id}
+Usecase: Used to retrieve more details of a specific teammate.
+Method: GET,
+headers:{
+       Authorization: 'Bearer ${token}'
+}
+ 
+-------------------------------------------
+Endpoint 3: https://hsqserver-833x.onrender.com/api/users/user/profilePicture/update
 Usecase: Update My Profile Picture
 Method: PUT,
 headers:{
